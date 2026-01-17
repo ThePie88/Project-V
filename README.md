@@ -1,3 +1,37 @@
+                                                                                                                 JJJJJJJ      
+                                                                                                          JJJJJJJJJJJJJJJ     
+                                                                                                    HJJJJJJJJJJJJJJJJ JJJ     
+                                                                                             JJJJJJJJJJJJJJJJJJJJJ  JJJJJJ    
+                                                                                      JJJJJJJJJJJJJJJJJJJJ           JJJJJ    
+                                                                                JJJJJJJJJJJJ  JJJJJ                  JJJJJJ   
+                                                                         JJJJJJJJJJJJJJJJJJJJ            JJJJ         J JJJ   
+                                                                 JJJJJJJJJJJJJJJJJJJJJ           JJJJJ   JJJJ         JJJJJJ  
+                                                          JJJJJJJJJJJJJJJJJJJJJ       JJ  JJJJ   JJJJJ    JJJ         JJJJJJ  
+                                                    JJJJJJJJJJJJJJJJJJJJJ        JJJJJJJJ JJJJ   JJJJJJ   JJJJ         JJ  JJ 
+                                             JJJJJJJJJJJJJJJJJJJJJ       JJ  JJJ JJJJJJ    JJJ   JJJJJJJ   JJJJ         JJJJJ 
+                                     JJJJJJJJJJJJJJJJJJJJJJ       JJJJJ  JJJ JJJJ   JJJJ   JJJJ   JJJJJJJ  JJJJJJJ      JJJJJJ
+                                JJJJJJJJJJJJ  JJJJL             JJJJJJ   JJJJJJJJ    JJJ    JJJJ  JJJJJJJJ  JJJJJJ      JJJJJJ
+                        JJJJJJJJJJJJJJJJJJJJJL        JJJJJJJJJ  JJJ     JJJJJJJJJ   JJJJ   JJJJ  JJJ  JJJ          JJJJJJJJJJ
+                 JJJJJJJJJJJJJJJJJJJJJ       JJ  JJJJ  JJJ  JJJ  JJJJJJJ  JJJJJJJJ    JJJ    JJJ  JJJ       JJJJJJJJJJJJJJJJJJ
+          JJJJJJJJJJJJJLLJJJJJJ          JJJJJJJ JJJJ  JJJJ JJJJ  JJJJ     JJJJJJJJ   JJJJ           JJJJJJJJJJJJJJJJJJJJJ    
+    JJJJJJJJJJJJJJJJJJJJJ       JJ  JJJJ  JJJ     JVJ   JJJJ JJJ  JJJJ     JJJ  JJJ    L       JJJJJJJJJJJJJJJJJJJJJ          
+JJJJJJJJJJJJJJJJJJ      JJJJJ   JJJ  JJJ  JJJJJJ  JJJJ  JJJJ JJJJ  JJJJJJJ LJJJ         JJJJJJ JJJJJJJJJJ  JJ                 
+JJJJJJJJJJ            JJJJJJJJ  JJJJJJJJ   JJJJJJ  JJJJ  JJJ JJJJ  JJJJJJ        JJJJJJJ JJJJJJJJJJJJJ                        
+JJJJJJ       JJJJJJJ  JJJ  JJJJ  JJJJJJJJ  JJJJ    JJJJ  JJJJJJJ           JJJJJJ JJ JJJJJJJJJJ                               
+JJJJJJ      JJJJ JJJJ JJJJ  JJJJ JJJJJJJJJ  JJJ     JJJ   JJ       JJJJJJJJJJJJJJJJJJJJJJ                                     
+ JJJJJ      JJJJ JJJ   JJJ  JJJJ  JJJ JJJJ  JJJJ            J JJJJJJJJJJJJJJJJJJJ                                             
+ JJJJJJ      JJJJ       JJJ JJJJ  JJJJ JJJJ           JJJJJJ JJJJJJJJJJJJJ                                                    
+  JJJJJJ     JJJJ JJJJ  JJJJJJJJ   JJJ         JJJJJJJJJJJJJJJJJJJJJ                                                          
+  JJJJJJ      JJJJ JJJJ  JJJJJJ         JJJJJJJJJJJJJJJJJJJJJ                                                                 
+   JJJ J       JJJJJJJ           JJJJJJJJJJJJJJJJJJJJ                                                                         
+   JJJJJJ       JJJJ       JJJJJJJJJJJJJJJJJJJJJ                                                                              
+    JJJJJ           JJJJJJJJJJJJJJJJJJJJJ                                                                                     
+    JJJJJJ  JJJJJJJJJJJJJJJJJJJJJ                                                                                             
+     JJJ JJ   JJJJJJJJJJJL                                                                                                    
+     JJJJJJJJJJJJJJJ                                                                                                          
+      JJJJJJJ                                                                                                                 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+
 # Project-V
 Mapping the gap between NP-Hard identity and P-time execution.
 
