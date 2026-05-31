@@ -46,6 +46,34 @@ Translated from the original manifesto ([`progetto/Leggi_di_Pie.pdf`](progetto/L
 
 > *"It may become anything it wants, except something that cannot be understood or stopped."*
 
+## The brain: a spiking-neuron controller
+
+The kernel doesn't decide with plain `if`/`else`. Underneath, it runs a small brain:
+
+- **10 Izhikevich spiking neurons** — the same equations used to model real cortical cells
+  (regular-spiking, bursting, fast-spiking…) — feeding a
+- **128-node Echo State Network reservoir** (spectral radius 0.95): a pool of neurons whose
+  internal echoes give the system short-term temporal memory.
+
+A trained readout (ridge regression) maps the live spike pattern onto five **control levers**
+that actually steer behavior each turn: how much to recall, whether tools are allowed, how
+verbose to be, when to consolidate memory, and how hard to deliberate. This is not decoration —
+an ablation shows the neural state changes **5 out of 5** pipeline decisions, and it beats a
+plain linear model on temporal benchmarks (delayed-XOR, NARMA-10, memory capacity).
+
+It also **learns** (spike-timing-dependent plasticity, reward-modulated). And — the part I find
+most fun — **emotions crystallize into hard limits through a bifurcation**: when spike density
+crosses a threshold (with hysteresis), the controller undergoes a phase transition and a new
+behavioral constraint is born — traced, explainable, and revocable. A "scar" becoming a
+boundary, implemented as a dynamical-systems event rather than a hand-written rule.
+
+The whole thing is **~300 lines of pure Python, no numpy, under 2 ms per turn**. Its stability
+is bounded *by construction* and verified empirically (honestly *not* a formal proof — see
+[`progetto/STABILITY.md`](progetto/STABILITY.md)).
+
+And you can watch it think: [`Interfaccia/`](Interfaccia/) is an experimental real-time
+visualizer — "The Observatory" — that renders the neurons firing as they spike.
+
 ## The honest version
 
 This started as an attempt to build a persistent software *entity* — "Ivy" — with internal
@@ -81,6 +109,8 @@ Same move, different target.
   identically.
 - **Append-only audit.** Every turn emits structured events (state updates, gating decisions,
   memory writes, tool calls/denials), exportable as a hash-chained, tamper-evident bundle.
+- **A spiking-neuron controller with real authority** (see above): 10 Izhikevich neurons + a
+  128-node reservoir, trained readout, learning via R-STDP, crystallization as a bifurcation.
 - **Snapshot / restore.** Full state — including the neural sub-state — serializes and restores
   idempotently, preserving the decision hash.
 - **Kill-switch.** When active: zero LLM calls, audit only.
@@ -100,10 +130,10 @@ I would rather be honest than impressive:
 - **No formal stability proof.** State stays bounded *by construction* (clamps + validators),
   verified empirically over many trajectories — but this is not a Lyapunov stability proof, and
   I say so explicitly in [`progetto/STABILITY.md`](progetto/STABILITY.md).
-- **The neural controller is more than the job strictly needs.** A finite-state machine would
-  cover today's gating. The spiking-neuron + reservoir backend is there because I wanted it; it
-  is honest reservoir computing (trained readout, ablation vs a linear baseline), but it is
-  swappable via a plugin protocol.
+- **The neural controller is one backend, not a hard requirement.** A finite-state machine would
+  cover today's gating; the spiking-neuron brain is the default because it's more interesting and
+  measurably better on temporal tasks, but it's swappable via a plugin protocol (a linear-ODE
+  baseline ships alongside it).
 - **The specifications are in Italian.** `progetto/` (SPEC, ARCH, the design pillars, the V1–V6
   milestone docs) is written in Italian and not yet translated.
 
@@ -150,7 +180,7 @@ progetto/     the specifications (Italian): SPEC, ARCH, PILASTRI, V1-V6, STABILI
 schemas/      JSON schemas / contracts
 tests/        the test suite
 examples/     conformance cassettes / scenarios
-Interfaccia/  an experimental web visualizer of the neural reservoir
+Interfaccia/  an experimental web visualizer of the neural reservoir ("The Observatory")
 ```
 
 ## License
