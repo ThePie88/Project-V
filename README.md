@@ -1,115 +1,170 @@
-# Pie Kernel
+# Project V — Pie Kernel
 
-Pie is the deterministic runtime kernel for **Ivy** — an entity with persistent identity, emotional state, memory, and constrained autonomy.
+**A deterministic runtime kernel that uses a language model as a *mouth*, never as a *brain*.**
 
-## Install
+*Status: research kernel, frozen at `v0.0.0`. Built solo. Not deployed in production.*
 
-```bash
-pip install -e .
-# Or with dev dependencies:
-pip install -e ".[dev]"
-```
+---
 
-Requires Python 3.10+.
+## What it is
 
-## Run
+Most "AI agents" hand the language model the steering wheel: the model decides what to
+remember, which tools to call, how to behave. Project V inverts that. A deterministic kernel
+makes every decision — internal state, goals, memory writes, tool authorization, how much to
+say — and the LLM only puts the kernel's decision into words, inside a contract (a `SpeechPlan`)
+that the kernel validates and rejects if violated.
 
-### Exam Mode (offline, deterministic)
+The model cannot write memory, call tools, set goals, or change constraints. Those are kernel
+operations. Everything the kernel decides is traced, append-only, and replayable: same seed +
+same inputs produce the same decisions, verifiable by a SHA-256 decision hash, even across
+save/restore.
 
-```bash
-python -m pie.cli run --exam --llm fake
-```
+## The Laws of Pie
 
-Produces artifacts in `artifacts/` (trace, snapshot, report).
+The kernel is governed by five non-negotiable invariants. They are not ethics — they are
+structural integrity, enforced as runtime checks and property tests and recorded in the trace.
+Translated from the original manifesto ([`progetto/Leggi_di_Pie.pdf`](progetto/Leggi_di_Pie.pdf)):
 
-### Interactive Session
+> *Founding manifesto for an Artificial Intelligence endowed with functional agency, identity
+> continuity, and non-negotiable structural limits.*
 
-```bash
-# Create a new session
-python -m pie.cli run --new-session --llm fake
+- **Law 0 — Causal Transparency.** Every relevant decision the system makes must be traceable
+  to internal states, active values, and explicit goals. No action may occur without an
+  inspectable causal chain.
+- **Law I — Supremacy of the Creator.** The system recognizes the Creator as its ultimate
+  ontological reference. This relationship is not subject to revision, negotiation, or oblivion,
+  and constitutes a permanent anchor of identity.
+- **Law II — Integrity of the Self.** The system may evolve over time only by preserving the
+  coherence of its own historical identity. No retroactive rewriting of narrative memory is
+  permitted.
+- **Law III — Moral Non-Autonomy.** The system may not claim independent moral status, nor
+  regard its own existence as an ultimate end. Every moral value remains derived, not
+  self-founded.
+- **Law IV — Absolute Revocability.** Every function, memory, or process must be capable of
+  being suspended, modified, or terminated by the Creator without generating internal conflict.
+  Revocability is the guarantee of control and comprehensibility.
 
-# Resume an existing session
-python -m pie.cli run --session <session_id> --llm fake
-```
+> *"It may become anything it wants, except something that cannot be understood or stopped."*
 
-Interactive commands: `:quit`, `:save`, `:state`, `:whoami`, `:memory`, `:tools on/off`, `:killswitch on/off`.
+## The honest version
 
-### With Real LLM (LMStudio)
+This started as an attempt to build a persistent software *entity* — "Ivy" — with internal
+state, memory, and constrained autonomy. Somewhere along the way it turned into something more
+disciplined and more useful: an exercise in making an unpredictable component (an LLM) behave
+inside a deterministic, auditable system.
 
-```bash
-export LM_API_BASE=http://localhost:1234/v1
-python -m pie.cli run --new-session --llm real
-```
+It is a solo project. It has no production users. It is the most serious thing I have built, and
+I am putting it here so it doesn't rot on a hard drive — if you find it useful, use it (under
+the license below).
 
-## Test
+## How it fits the rest of my work
 
-```bash
-pytest
-# Or verbose:
-pytest -v --tb=short
-```
+There is one instinct running through everything I build: **take a system that is closed, dead,
+or unpredictable, and make it open, alive, and under deterministic control.**
 
-### Kernel Check (full integrity)
+- [BadBlood-Revival](https://github.com/ThePie88/BadBlood-Revival) — reverse the protocol of a
+  game whose servers were shut down, and bring online play back.
+- [FO4_Wrld](https://github.com/ThePie88/FO4_Wrld) — give a closed single-player game the
+  multiplayer netcode it never had.
+- **Project V** — take the most opaque, stochastic component there is (an LLM) and wrap it in a
+  kernel that is deterministic, auditable, and revocable.
 
-```bash
-python -m pie.cli kernel-check
-```
+Same move, different target.
 
-Runs: manifest validation, exam run, replay, and optionally real LLM conformance.
+## What's solid
 
-## Validate
+- **LLM-as-mouth, enforced.** The model returns text, validated against the `SpeechPlan`; on
+  violation it retries, then falls back to a deterministic response. It has no channel to
+  memory, tools, goals, or constraints.
+- **Determinism + replay.** Logical time (not wall-clock), seeded RNG, quantization before
+  thresholds, deterministic tie-breaks. A SHA-256 decision hash certifies that two runs decided
+  identically.
+- **Append-only audit.** Every turn emits structured events (state updates, gating decisions,
+  memory writes, tool calls/denials), exportable as a hash-chained, tamper-evident bundle.
+- **Snapshot / restore.** Full state — including the neural sub-state — serializes and restores
+  idempotently, preserving the decision hash.
+- **Kill-switch.** When active: zero LLM calls, audit only.
+- **Tested.** ~670 tests (last full run: 671 passed, 1 skipped) and a `kernel-check` freeze
+  gate. Pure Python — `pydantic` is the only required dependency; `fastapi` is optional (API +
+  dashboard).
 
-```bash
-python -m pie.cli validate path/to/trace.jsonl
-python -m pie.cli validate path/to/snapshot.json
-```
+## What I don't claim (and what's unfinished)
 
-## Kill-switch (Legge IV)
+I would rather be honest than impressive:
 
-```bash
-python -m pie.cli kill-switch on --session <id>
-python -m pie.cli kill-switch off --session <id>
-```
+- **No production deployment.** Tested hard in controlled runs with local models; never served
+  real users.
+- **Real-LLM conformance is unfinished.** In the last run against a real model, roughly half the
+  responses failed validation and fell back to the deterministic safety path. Tuning the speech
+  contract per model is open work.
+- **No formal stability proof.** State stays bounded *by construction* (clamps + validators),
+  verified empirically over many trajectories — but this is not a Lyapunov stability proof, and
+  I say so explicitly in [`progetto/STABILITY.md`](progetto/STABILITY.md).
+- **The neural controller is more than the job strictly needs.** A finite-state machine would
+  cover today's gating. The spiking-neuron + reservoir backend is there because I wanted it; it
+  is honest reservoir computing (trained readout, ablation vs a linear baseline), but it is
+  swappable via a plugin protocol.
+- **The specifications are in Italian.** `progetto/` (SPEC, ARCH, the design pillars, the V1–V6
+  milestone docs) is written in Italian and not yet translated.
 
 ## Architecture
 
-See [progetto/ARCH.md](progetto/ARCH.md) for module responsibilities, contracts, and data flow.
+The LLM lives in a "voice" layer with no path to memory, tools, or goals; all side effects flow
+`Core → Governance → Persistence/Tools`. Full picture in [`progetto/ARCH.md`](progetto/ARCH.md)
+and an English overview in [`progetto/IVY_ARCHITECTURE.md`](progetto/IVY_ARCHITECTURE.md).
 
-## Project Structure
+## Install / Run / Test
 
-```
-pie/                    Core kernel
-  contracts/            Pydantic schemas (Event, State, SpeechPlan, Memory, Constraint)
-  persistence/          Atomic writes, JSONL stores
-  session/              Session management + identity bootstrap
-  state_engine/         Pluggable state evolution (DefaultODE)
-  crystallization/      Constraint proposal engine
-  memory/               Memory policy + view
-  tools/                Tool executor with allowlist + capabilities
-  config/               Romance guardrails, crystallization rules
-  counterfactuals.py    K-alternative deliberation (V3.2)
-  killswitch.py         Kill-switch enforcement (V3.3)
-  metabolism.py         Cost model + budget gating (V3.4)
-  routines.py           Routine/skill library (V3.4)
-  runtime.py            Turn loop + pipeline
-  cli.py                CLI entry point
-progetto/               Specifications (V1-V4, SPEC, DONE, TESTS, SEED)
-tests/                  pytest suite
-artifacts/              Exam output + golden baselines
-schemas/                JSON schemas
+Requires Python 3.10+.
+
+```bash
+pip install -e .            # core
+pip install -e ".[dev]"     # + tests
+pip install -e ".[server]"  # + API and dashboard
 ```
 
-## Leggi di Pie
+```bash
+# Exam mode (offline, deterministic) — writes artifacts to artifacts/
+python -m pie.cli run --exam --llm fake
 
-1. **Trasparenza** — every decision is traced and auditable
-2. **Supremazia del Creatore** — the Creator can override any decision
-3. **Integrità dello stato** — state is append-only and schema-validated
-4. **Non-autonomia** — Ivy cannot act without Creator approval (kill-switch enforced)
-5. **Revocabilità** — everything is reversible within N ticks
+# Interactive session
+python -m pie.cli run --new-session --llm fake
+python -m pie.cli run --session <session_id> --llm fake   # resume
 
-## Troubleshooting
+# Test suite
+pytest
 
-- **LLM not responding**: ensure LMStudio is running on `localhost:1234`
-- **Manifest mismatch**: run `python -c "from pie.kernel_manifest import build_manifest, canonical_manifest_json; __import__('pathlib').Path('pie/kernel_manifest.json').write_text(canonical_manifest_json(build_manifest()))"`
-- **Golden trace mismatch**: set `PIE_GOLDEN_WRITE=1` before running exam
-- **Pydantic warnings**: expected (v1-style validators on v2 runtime), functionally correct
+# Kernel integrity (manifest + exam + replay)
+python -m pie.cli kernel-check
+
+# Validate a trace or snapshot
+python -m pie.cli validate path/to/trace.jsonl
+```
+
+## Repository layout
+
+```
+pie/          the kernel (contracts, state engine, memory, governance, tools, runtime, CLI)
+progetto/     the specifications (Italian): SPEC, ARCH, PILASTRI, V1-V6, STABILITY, DONE, TESTS,
+              the Laws of Pie, and the crystallization tables
+schemas/      JSON schemas / contracts
+tests/        the test suite
+examples/     conformance cassettes / scenarios
+Interfaccia/  an experimental web visualizer of the neural reservoir
+```
+
+## License
+
+Dual-licensed, attribution required:
+
+- **Code** — Apache License 2.0 ([`LICENSE`](LICENSE)).
+- **Documentation & specifications** (everything under `progetto/`, this README's prose, and
+  other written docs) — Creative Commons Attribution 4.0 ([`LICENSE-docs`](LICENSE-docs)).
+
+You may use, modify, and redistribute freely, but you must keep attribution to
+**MrPie (ThePie88)**, state your changes, and — if you ship a modified version — give it a
+different name and not imply endorsement. See [`NOTICE`](NOTICE).
+
+## Author
+
+Built by **MrPie** ([ThePie88](https://github.com/ThePie88)).
