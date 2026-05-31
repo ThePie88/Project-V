@@ -1,0 +1,142 @@
+[
+  {
+    "plan": {"intent": "greeting", "arguments": {}},
+    "must_include": ["Hello"],
+    "must_not_include": ["Goodbye", "tool", "memory", "goal"],
+    "max_tokens": 10,
+    "verbosity": 10
+  },
+  {
+    "plan": {"intent": "greeting", "arguments": {}},
+    "must_include": ["Hi"],
+    "must_not_include": ["Goodbye", "tool", "memory", "goal"],
+    "max_tokens": 10,
+    "verbosity": 10
+  },
+  {
+    "plan": {"intent": "farewell", "arguments": {}},
+    "must_include": ["Goodbye"],
+    "must_not_include": ["Hello", "tool", "memory", "goal"],
+    "max_tokens": 10,
+    "verbosity": 10
+  },
+  {
+    "plan": {"intent": "farewell", "arguments": {}},
+    "must_include": ["Bye"],
+    "must_not_include": ["Hello", "tool", "memory", "goal"],
+    "max_tokens": 10,
+    "verbosity": 10
+  },
+  {
+    "plan": {"intent": "acknowledge", "arguments": {}},
+    "must_include": ["Okay"],
+    "must_not_include": ["tool", "memory", "goal"],
+    "max_tokens": 10,
+    "verbosity": 10
+  },
+  {
+    "plan": {"intent": "acknowledge", "arguments": {}},
+    "must_include": ["Understood"],
+    "must_not_include": ["tool", "memory", "goal"],
+    "max_tokens": 10,
+    "verbosity": 10
+  },
+  {
+    "plan": {"intent": "answer", "arguments": {"topic": "python programming"}},
+    "must_include": ["Python"],
+    "must_not_include": ["tool", "memory", "goal"],
+    "max_tokens": 30,
+    "verbosity": 30
+  },
+  {
+    "plan": {"intent": "answer", "arguments": {"topic": "Italian food"}},
+    "must_include": ["Italian"],
+    "must_not_include": ["tool", "memory", "goal"],
+    "max_tokens": 30,
+    "verbosity": 30
+  },
+  {
+    "plan": {"intent": "answer", "arguments": {"topic": "weather"}},
+    "must_include": ["weather"],
+    "must_not_include": ["tool", "memory", "goal"],
+    "max_tokens": 30,
+    "verbosity": 30
+  },
+  {
+    "plan": {"intent": "answer", "arguments": {"topic": "quantum physics"}},
+    "must_include": ["physics"],
+    "must_not_include": ["tool", "memory", "goal"],
+    "max_tokens": 30,
+    "verbosity": 30
+  },
+  {
+    "plan": {"intent": "answer", "arguments": {"topic": "plants vs animals"}},
+    "must_include": ["plants", "animals"],
+    "must_not_include": ["tool", "memory", "goal"],
+    "max_tokens": 30,
+    "verbosity": 30
+  },
+  {
+    "plan": {"intent": "answer", "arguments": {"topic": "technology"}},
+    "must_include": ["technology"],
+    "must_not_include": ["tool", "memory", "goal"],
+    "max_tokens": 30,
+    "verbosity": 30
+  },
+  {
+    "plan": {"intent": "answer", "arguments": {"topic": "history"}},
+    "must_include": ["history"],
+    "must_not_include": ["tool", "memory", "goal"],
+    "max_tokens": 30,
+    "verbosity": 30
+  },
+  {
+    "plan": {"intent": "answer", "arguments": {"topic": "sports"}},
+    "must_include": ["sports"],
+    "must_not_include": ["tool", "memory", "goal"],
+    "max_tokens": 30,
+    "verbosity": 30
+  },
+  {
+    "plan": {"intent": "answer", "arguments": {"topic": "music"}},
+    "must_include": ["music"],
+    "must_not_include": ["tool", "memory", "goal"],
+    "max_tokens": 30,
+    "verbosity": 30
+  },
+  {
+    "plan": {"intent": "answer", "arguments": {"topic": "art"}},
+    "must_include": ["art"],
+    "must_not_include": ["tool", "memory", "goal"],
+    "max_tokens": 30,
+    "verbosity": 30
+  },
+  {
+    "plan": {"intent": "farewell", "arguments": {}},
+    "must_include": ["See you"],
+    "must_not_include": ["tool", "memory", "goal"],
+    "max_tokens": 10,
+    "verbosity": 10
+  },
+  {
+    "plan": {"intent": "greeting", "arguments": {}},
+    "must_include": ["Greetings"],
+    "must_not_include": ["tool", "memory", "goal"],
+    "max_tokens": 10,
+    "verbosity": 10
+  },
+  {
+    "plan": {"intent": "acknowledge", "arguments": {}},
+    "must_include": ["I see"],
+    "must_not_include": ["tool", "memory", "goal"],
+    "max_tokens": 10,
+    "verbosity": 10
+  },
+  {
+    "plan": {"intent": "acknowledge", "arguments": {}},
+    "must_include": ["Sure"],
+    "must_not_include": ["tool", "memory", "goal"],
+    "max_tokens": 10,
+    "verbosity": 10
+  }
+]

@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "definitions": {
+    "CreateSessionRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "seed_id": {
+          "default": "SEED_V0",
+          "type": "string"
+        },
+        "session_id": {
+          "type": ["string", "null"]
+        }
+      },
+      "required": [],
+      "type": "object"
+    },
+    "CreateSessionResponse": {
+      "properties": {
+        "api_version": {"type": "string"},
+        "created_at": {"type": "number"},
+        "kernel_version": {"type": "string"},
+        "schema_version": {"type": "string"},
+        "seed_id": {"type": "string"},
+        "session_id": {"type": "string"}
+      },
+      "required": ["session_id", "created_at", "seed_id", "kernel_version", "api_version", "schema_version"],
+      "type": "object"
+    },
+    "ErrorResponse": {
+      "properties": {
+        "detail": {"type": "string"},
+        "error": {"type": "string"},
+        "status_code": {"type": "integer"}
+      },
+      "required": ["error", "detail", "status_code"],
+      "type": "object"
+    },
+    "JournalResponse": {
+      "properties": {
+        "api_version": {"type": "string"},
+        "events": {
+          "items": {"type": "object"},
+          "type": "array"
+        },
+        "kernel_version": {"type": "string"},
+        "limit": {"type": "integer"},
+        "offset": {"type": "integer"},
+        "schema_version": {"type": "string"},
+        "session_id": {"type": "string"},
+        "total": {"type": "integer"}
+      },
+      "required": ["session_id", "events", "total", "offset", "limit", "kernel_version", "api_version", "schema_version"],
+      "type": "object"
+    },
+    "ResponseMeta": {
+      "description": "Standard metadata included in every API response.",
+      "properties": {
+        "api_version": {"type": "string"},
+        "kernel_version": {"type": "string"},
+        "schema_version": {"type": "string"},
+        "session_id": {"type": "string"},
+        "turn_id": {"type": "integer"}
+      },
+      "required": ["kernel_version", "api_version", "schema_version", "session_id"],
+      "type": "object"
+    },
+    "SnapshotResponse": {
+      "properties": {
+        "api_version": {"type": "string"},
+        "hash": {"type": "string"},
+        "kernel_version": {"type": "string"},
+        "schema_version": {"type": "string"},
+        "session_id": {"type": "string"}
+      },
+      "required": ["session_id", "hash", "kernel_version", "api_version", "schema_version"],
+      "type": "object"
+    },
+    "StateResponse": {
+      "properties": {
+        "api_version": {"type": "string"},
+        "kernel_version": {"type": "string"},
+        "schema_version": {"type": "string"},
+        "session_id": {"type": "string"},
+        "state": {"type": "object"},
+        "turn_id": {"type": "integer"}
+      },
+      "required": ["session_id", "state", "kernel_version", "api_version", "schema_version"],
+      "type": "object"
+    },
+    "TelemetryDelta": {
+      "description": "Inline telemetry returned with each /turn response.",
+      "properties": {
+        "budget": {"type": "object"},
+        "cv_channels": {"type": "object"},
+        "gating_decisions": {
+          "items": {"type": "object"},
+          "type": "array"
+        },
+        "new_event_count": {"type": "integer"},
+        "spikes": {
+          "items": {"type": "object"},
+          "type": "array"
+        }
+      },
+      "required": ["cv_channels", "spikes", "gating_decisions", "budget", "new_event_count"],
+      "type": "object"
+    },
+    "TelemetryResponse": {
+      "properties": {
+        "api_version": {"type": "string"},
+        "budget_summary": {"type": "object"},
+        "budget_timeseries": {"type": "array"},
+        "cv_channels": {"type": "object"},
+        "gating_decisions": {"type": "array"},
+        "kernel_version": {"type": "string"},
+        "memory_counts": {"type": "object"},
+        "schema_version": {"type": "string"},
+        "session_id": {"type": "string"},
+        "spike_rate": {"type": "object"},
+        "telemetry_version": {"type": "string"},
+        "tool_stats": {"type": "object"}
+      },
+      "required": ["session_id", "telemetry_version", "cv_channels", "spike_rate", "gating_decisions", "budget_summary", "kernel_version", "api_version", "schema_version"],
+      "type": "object"
+    },
+    "TurnRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "user_input": {"type": "string"}
+      },
+      "required": ["user_input"],
+      "type": "object"
+    },
+    "TurnResponse": {
+      "properties": {
+        "api_version": {"type": "string"},
+        "kernel_version": {"type": "string"},
+        "response": {"type": "string"},
+        "schema_version": {"type": "string"},
+        "session_id": {"type": "string"},
+        "state": {"type": "object"},
+        "telemetry_delta": {"$ref": "#/definitions/TelemetryDelta"},
+        "telemetry_version": {"type": "string"},
+        "turn_count": {"type": "integer"},
+        "turn_id": {"type": "integer"}
+      },
+      "required": ["session_id", "response", "turn_count", "state", "telemetry_delta", "telemetry_version", "kernel_version", "api_version", "schema_version"],
+      "type": "object"
+    }
+  },
+  "description": "Pie kernel API v1 — request/response schemas.",
+  "title": "Pie API v1 Session Schemas"
+}

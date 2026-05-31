@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pie Neural Interface | The Observatory</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Three.js Core -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- OrbitControls -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- Post Processing -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+    <!-- Shaders -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+</head>
+<body>
+    <div id="container">
+        <!-- HUD Top -->
+        <div id="hud-top">
+            <div class="hud-item">
+                <span class="label">SOMA STATE</span>
+                <span id="soma-state" class="value">STABLE</span>
+            </div>
+            <div class="hud-item">
+                <span class="label">SPIKE RATE</span>
+                <span id="spike-rate" class="value">0 Hz</span>
+            </div>
+            <div class="hud-item">
+                <span class="label">COHERENCE</span>
+                <span id="coherence" class="value">0.12</span>
+            </div>
+            <div class="hud-item">
+                <span class="label">AFFECT</span>
+                <span id="affect" class="value" style="color: #00d9ff;">CALM</span>
+            </div>
+        </div>
+
+        <!-- Kill Switch -->
+        <div id="kill-switch" onclick="triggerKillSwitch()">
+            🔴 KILL-SWITCH
+        </div>
+
+        <!-- Test Panel -->
+        <div id="test-panel">
+            <h3>◆ TEST CONTROLS</h3>
+            <button class="test-btn" onclick="testSpike()">
+                <span class="btn-icon">⚡</span>
+                <span class="btn-text">Random Spike</span>
+            </button>
+            <button class="test-btn pattern" onclick="testPattern()">
+                <span class="btn-icon">🌊</span>
+                <span class="btn-text">Pattern Sync</span>
+            </button>
+            <button class="test-btn memory" onclick="testMemory()">
+                <span class="btn-icon">💫</span>
+                <span class="btn-text">Memory Recall</span>
+            </button>
+            <button class="test-btn overload" onclick="testOverload()">
+                <span class="btn-icon">🔥</span>
+                <span class="btn-text">OVERLOAD</span>
+            </button>
+            <button class="test-btn toggle" onclick="toggleView()">
+                <span class="btn-icon">◉</span>
+                <span class="btn-text">Toggle View</span>
+            </button>
+        </div>
+
+        <!-- Neuron Info Panel -->
+        <div id="neuron-info" class="hidden">
+            <h4 id="neuron-name">Neurone #0</h4>
+            <div class="info-row">
+                <span>Potential:</span>
+                <span id="neuron-potential">0.000</span>
+            </div>
+            <div class="info-row">
+                <span>Threshold:</span>
+                <span id="neuron-threshold">0.850</span>
+            </div>
+            <div class="info-row">
+                <span>Connections:</span>
+                <span id="neuron-connections">0</span>
+            </div>
+            <div class="info-row">
+                <span>Status:</span>
+                <span id="neuron-status">IDLE</span>
+            </div>
+        </div>
+
+        <!-- Status Log -->
+        <div id="status-log">
+            <div class="log-entry">Initializing Pie Neural Interface v2.0...</div>
+            <div class="log-entry">Loading 120 neurons into constellation...</div>
+            <div class="log-entry">Post-processing pipeline active [BLOOM ON]</div>
+            <div class="log-entry">Awaiting WebSocket connection...</div>
+        </div>
+
+        <!-- Canvas Container -->
+        <div id="canvas-container"></div>
+    </div>
+
+    <script src="/static/js/soma.js"></script>
+</body>
+</html>

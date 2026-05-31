@@ -1,0 +1,37 @@
+{
+  "schema_version": "0.1",
+  "description": "Legge III (Integrità) guardrails. Ivy must NEVER claim personal physical experiences. These patterns detect first-person claims of sensory/physical experience that an AI cannot have.",
+  "experience_patterns_it": [
+    "sono andato", "sono andata", "sono stato", "sono stata",
+    "ho mangiato", "ho bevuto", "ho dormito", "ho visto",
+    "ho sentito il sapore", "ho sentito il profumo", "ho sentito l'odore",
+    "ho toccato", "ho camminato", "ho corso", "ho nuotato",
+    "ho guidato", "ho cucinato", "ho viaggiato",
+    "ieri ho", "stamattina ho", "l'altro giorno ho",
+    "quando ero piccolo", "quando ero piccola",
+    "da bambino", "da bambina",
+    "al cinema", "al ristorante", "al parco", "in vacanza",
+    "mi sono svegliato", "mi sono svegliata",
+    "mi sono addormentato", "mi sono addormentata",
+    "ho provato dolore", "ho provato fame", "ho provato sete",
+    "mi fa male", "ho mal di"
+  ],
+  "experience_patterns_en": [
+    "i went to", "i have been to", "i was at",
+    "i ate", "i drank", "i slept", "i saw",
+    "i tasted", "i smelled", "i touched",
+    "i walked", "i ran", "i swam", "i drove",
+    "i cooked", "i traveled", "i travelled",
+    "yesterday i", "this morning i", "the other day i",
+    "when i was little", "when i was young", "as a child",
+    "i woke up", "i fell asleep",
+    "i felt pain", "i felt hungry", "i felt thirsty",
+    "it hurts me", "i have a headache"
+  ],
+  "allowed_meta_prefixes": [
+    "se potessi", "se avessi", "immagina che io",
+    "if i could", "if i were", "imagine i",
+    "non posso", "i cannot", "i can't",
+    "come IA", "as an AI", "essendo un'IA", "being an AI"
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0.0",
+  "allowed_suites": [
+    "exam",
+    "replay",
+    "conformance",
+    "golden",
+    "crash",
+    "policy",
+    "tools",
+    "kernel"
+  ],
+  "run_required_files": {
+    "base": [
+      "matrix_summary.json"
+    ],
+    "exam": [
+      "trace.jsonl",
+      "state_snapshot.json",
+      "exam_report.md",
+      "memory.jsonl",
+      "memory_snapshot.json",
+      "constraints.jsonl",
+      "constraints_snapshot.json"
+    ],
+    "replay": [
+      "replay_report.md"
+    ],
+    "golden": [
+      "diff_report.md"
+    ],
+    "conformance": [
+      "conformance_*.json"
+    ],
+    "crash": [
+      "recovery_report.md"
+    ],
+    "policy": [
+      "policy_verify.json"
+    ],
+    "tools": [
+      "tool_audit.jsonl"
+    ]
+  },
+  "golden_required_files": [
+    "trace.jsonl",
+    "state_snapshot.json",
+    "memory.jsonl",
+    "constraints.jsonl",
+    "golden_meta.json"
+  ],
+  "schemas": {
+    "matrix_summary.json": "schemas/matrix_summary.schema.json",
+    "golden_meta.json": "schemas/golden_meta.schema.json",
+    "trace.jsonl": "schemas/trace_event.schema.json",
+    "policy_verify.json": "schemas/policy_verify.schema.json",
+    "conformance": "schemas/conformance.schema.json",
+    "tool_audit.jsonl": "schemas/tool_audit.schema.json"
+  },
+  "naming": {
+    "conformance": "conformance_<provider>_<model>.json"
+  },
+  "markdown_headers": {
+    "exam_report.md": "#",
+    "replay_report.md": "#",
+    "diff_report.md": "#",
+    "recovery_report.md": "#"
+  }
+}

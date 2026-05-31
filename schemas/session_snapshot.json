@@ -1,0 +1,13 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Engine Snapshot",
+    "type": "object",
+    "required": ["snapshot_schema_version", "active_engine_id", "engine_version", "engine_state"],
+    "additionalProperties": false,
+    "properties": {
+        "snapshot_schema_version": {"type": "integer", "minimum": 1},
+        "active_engine_id": {"type": "string"},
+        "engine_version": {"type": "string"},
+        "engine_state": {"type": "object"}
+    }
+}

@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LLM Conformance",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "model",
+    "provider",
+    "metrics",
+    "results"
+  ],
+  "properties": {
+    "model": {
+      "type": "string"
+    },
+    "provider": {
+      "type": "string"
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total",
+        "ok",
+        "retry",
+        "fallback",
+        "ok_percent",
+        "retry_percent",
+        "fallback_percent"
+      ],
+      "properties": {
+        "total": {
+          "type": "integer"
+        },
+        "ok": {
+          "type": "integer"
+        },
+        "retry": {
+          "type": "integer"
+        },
+        "fallback": {
+          "type": "integer"
+        },
+        "ok_percent": {
+          "type": "number"
+        },
+        "retry_percent": {
+          "type": "number"
+        },
+        "fallback_percent": {
+          "type": "number"
+        }
+      }
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "case_index",
+          "outcome",
+          "attempts",
+          "generated"
+        ],
+        "properties": {
+          "case_index": {
+            "type": "integer"
+          },
+          "outcome": {
+            "type": "string"
+          },
+          "attempts": {
+            "type": "integer"
+          },
+          "generated": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

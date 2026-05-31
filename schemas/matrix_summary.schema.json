@@ -1,0 +1,144 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Matrix Summary",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifacts_schema_version",
+    "run_id",
+    "preset",
+    "config",
+    "suites",
+    "llm_stats",
+    "warnings",
+    "overall"
+  ],
+  "properties": {
+    "artifacts_schema_version": {
+      "type": "string"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "preset": {
+      "type": "string"
+    },
+    "config": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "voice",
+        "cache",
+        "replay",
+        "golden",
+        "crash_test",
+        "policy",
+        "tools",
+        "rate_limit",
+        "seed",
+        "only"
+      ],
+      "properties": {
+        "voice": {
+          "type": "string"
+        },
+        "cache": {
+          "type": "string"
+        },
+        "replay": {
+          "type": "string"
+        },
+        "golden": {
+          "type": "string"
+        },
+        "crash_test": {
+          "type": "string"
+        },
+        "policy": {
+          "type": "string"
+        },
+        "tools": {
+          "type": "string"
+        },
+        "rate_limit": {
+          "type": "string"
+        },
+        "seed": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "only": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "suites": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "reason",
+          "artifacts"
+        ],
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "artifacts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "llm_stats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "retry_count",
+        "fallback_count",
+        "output_count",
+        "retry_rate",
+        "fallback_rate"
+      ],
+      "properties": {
+        "retry_count": {
+          "type": "integer"
+        },
+        "fallback_count": {
+          "type": "integer"
+        },
+        "output_count": {
+          "type": "integer"
+        },
+        "retry_rate": {
+          "type": "number"
+        },
+        "fallback_rate": {
+          "type": "number"
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "overall": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Golden Meta",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifacts_schema_version",
+    "generated_at",
+    "source_run_id",
+    "preset",
+    "config",
+    "llm",
+    "policy_hash",
+    "kernel_manifest_hash"
+  ],
+  "properties": {
+    "artifacts_schema_version": {
+      "type": "string"
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "source_run_id": {
+      "type": "string"
+    },
+    "preset": {
+      "type": "string"
+    },
+    "config": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "voice",
+        "cache",
+        "replay",
+        "golden",
+        "crash_test",
+        "policy",
+        "tools",
+        "rate_limit",
+        "seed",
+        "only"
+      ],
+      "properties": {
+        "voice": {
+          "type": "string"
+        },
+        "cache": {
+          "type": "string"
+        },
+        "replay": {
+          "type": "string"
+        },
+        "golden": {
+          "type": "string"
+        },
+        "crash_test": {
+          "type": "string"
+        },
+        "policy": {
+          "type": "string"
+        },
+        "tools": {
+          "type": "string"
+        },
+        "rate_limit": {
+          "type": "string"
+        },
+        "seed": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "only": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "llm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "model",
+        "base_url"
+      ],
+      "properties": {
+        "provider": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string"
+        },
+        "base_url": {
+          "type": "string"
+        }
+      }
+    },
+    "policy_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "kernel_manifest_hash": {
+      "type": "string"
+    }
+  }
+}

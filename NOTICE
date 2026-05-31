@@ -1,0 +1,23 @@
+Project V — Pie Kernel
+Copyright 2026 MrPie (ThePie88)
+https://github.com/ThePie88
+
+This product includes software developed by MrPie (ThePie88).
+
+Dual licensing:
+  - The SOURCE CODE is licensed under the Apache License, Version 2.0.
+    See the LICENSE file.
+  - The DOCUMENTATION and SPECIFICATIONS (all files under progetto/, the prose
+    sections of README.md, and any other written/narrative document in this
+    repository) are licensed under the Creative Commons Attribution 4.0
+    International License (CC BY 4.0). See the LICENSE-docs file.
+
+Naming and attribution:
+  "Project V", "Pie Kernel", and "Ivy" are names associated with this project
+  and its author, MrPie (ThePie88). You are free to use, modify, and
+  redistribute this work under the licenses above, but if you distribute a
+  modified version you must:
+    (a) state that you changed it,
+    (b) retain this attribution, and
+    (c) use a different project name and not imply endorsement by the
+        original author.

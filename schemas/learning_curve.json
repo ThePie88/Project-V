@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "LearningCurveReport",
+  "description": "V6a-R4 learning curve report: 3 conditions × N episodes",
+  "type": "object",
+  "required": ["schema_version", "seed", "n_episodes", "turns_per_episode", "conditions"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "seed": {
+      "type": "integer"
+    },
+    "n_episodes": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "turns_per_episode": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "conditions": {
+      "type": "object",
+      "required": ["no_plasticity", "stdp_only", "rstdp"],
+      "properties": {
+        "no_plasticity": { "$ref": "#/$defs/episode_list" },
+        "stdp_only": { "$ref": "#/$defs/episode_list" },
+        "rstdp": { "$ref": "#/$defs/episode_list" }
+      }
+    }
+  },
+  "$defs": {
+    "episode_list": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["episode", "tool_deny_rate", "recall_precision", "mean_cost", "total_reward", "weight_norm"],
+        "properties": {
+          "episode": { "type": "integer", "minimum": 0 },
+          "tool_deny_rate": { "type": "number", "minimum": 0, "maximum": 1 },
+          "recall_precision": { "type": "number", "minimum": 0, "maximum": 1 },
+          "mean_cost": { "type": "number", "minimum": 0 },
+          "total_reward": { "type": "number" },
+          "weight_norm": { "type": "number", "minimum": 0 }
+        }
+      }
+    }
+  }
+}

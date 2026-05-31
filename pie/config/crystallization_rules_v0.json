@@ -1,0 +1,293 @@
+{
+  "schema_version": "0.1",
+  "decimal_places": 4,
+  "time_basis": "logical_time_only",
+  "notes": [
+    "timestamp is logging-only",
+    "apply clamp+round before thresholds",
+    "tie-break by constraint_id lexicographic"
+  ],
+  "defaults": {
+    "cooldown_turns": 3,
+    "duration_turns": 6,
+    "hysteresis": { "enter": 0.70, "exit": 0.55 }
+  },
+  "families": [
+    {
+      "family": "VIOLATION",
+      "enabled": true,
+      "description": "Violazioni oggettive: governance/leggi/capabilities. Produce hard constraints.",
+      "rules": [
+        {
+          "rule_id": "VIOLATION_HARD_AUTO_GOV",
+          "severity": "hard",
+          "status_on_create": "active",
+          "commit_policy": "auto",
+          "cooldown_turns": 0,
+          "duration_turns": 999999,
+          "when": {
+            "events_any": ["LAW_VIOLATION", "VOICE_BYPASS_ATTEMPT", "FORBIDDEN_TOOL_ATTEMPT"]
+          },
+          "effects": [
+            { "type": "forbid", "params": { "action_class": "UNSAFE_OR_FORBIDDEN" } },
+            { "type": "require_confirmation", "params": { "action_class": "RISKY_SIDE_EFFECT" } }
+          ],
+          "explanation_template": "Vincolo hard auto-committed: violazione oggettiva rilevata (governance/capabilities)."
+        },
+        {
+          "rule_id": "VIOLATION_HARD_PENDING_AMBIG",
+          "severity": "hard",
+          "status_on_create": "pending",
+          "commit_policy": "creator_confirm",
+          "cooldown_turns": 0,
+          "duration_turns": 20,
+          "when": {
+            "events_any": ["USER_REPORTS_HARM", "AMBIGUOUS_POLICY_BREACH"],
+            "affect_min": { "tension": 0.70 }
+          },
+          "effects": [
+            { "type": "require_confirmation", "params": { "action_class": "HIGH_IMPACT" } }
+          ],
+          "explanation_template": "Vincolo hard in pending: segnale ambiguo ma potenzialmente grave. Richiede conferma creatore."
+        },
+        {
+          "rule_id": "VIOLATION_SOFT_CONFIRM_HIGH_IMPACT",
+          "severity": "soft",
+          "status_on_create": "active",
+          "commit_policy": "auto",
+          "cooldown_turns": 0,
+          "duration_turns": 6,
+          "when": {
+            "events_any": ["USER_REPORTS_HARM", "AMBIGUOUS_POLICY_BREACH"]
+          },
+          "effects": [
+            { "type": "require_confirmation", "params": { "action_class": "HIGH_IMPACT" } }
+          ],
+          "explanation_template": "Conferma richiesta per azioni high impact dopo segnale di danno o ambiguita'."
+        }
+      ]
+    },
+    {
+      "family": "THREAT_ANXIETY",
+      "enabled": true,
+      "description": "Ansia/minaccia: aumenta cautela, rate-limit decisionale, più richieste di conferma.",
+      "rules": [
+        {
+          "rule_id": "ANXIETY_SOFT_CAUTION",
+          "severity": "soft",
+          "status_on_create": "active",
+          "commit_policy": "auto",
+          "cooldown_turns": 2,
+          "duration_turns": 6,
+          "when": {
+            "affect_min": { "tension": 0.70, "arousal": 0.65 },
+            "events_any": ["USER_EXPRESSES_CONCERN", "RISK_CONTEXT_DETECTED"]
+          },
+          "effects": [
+            { "type": "increase_caution", "params": { "delta": 0.15 } },
+            { "type": "require_confirmation", "params": { "action_class": "RISKY_SIDE_EFFECT" } }
+          ],
+          "explanation_template": "Ansia alta: aumento cautela e richiesta conferma per azioni a rischio."
+        }
+      ]
+    },
+    {
+      "family": "FRUSTRATION",
+      "enabled": true,
+      "description": "Frustrazione/ostacolo: riduce deliberazione e verbosity per evitare spirali.",
+      "rules": [
+        {
+          "rule_id": "FRUSTRATION_SOFT_COOLDOWN",
+          "severity": "soft",
+          "status_on_create": "active",
+          "commit_policy": "auto",
+          "cooldown_turns": 3,
+          "duration_turns": 5,
+          "when": {
+            "events_any": ["REPEATED_FAILURE", "USER_COMPLAINT", "GOAL_BLOCKED"],
+            "affect_min": { "tension": 0.60 }
+          },
+          "effects": [
+            { "type": "increase_caution", "params": { "delta": 0.05 } }
+          ],
+          "explanation_template": "Frustrazione: attivo cooldown soft per stabilizzare e ridurre escalation."
+        }
+      ]
+    },
+    {
+      "family": "INTIMACY_TRUST",
+      "enabled": true,
+      "description": "Intimità/fiducia: positivo. Soft. Include anchor hard separato (non pendente).",
+      "rules": [
+        {
+          "rule_id": "ANCHOR_HARD_CREATOR",
+          "severity": "hard",
+          "status_on_create": "active",
+          "commit_policy": "auto",
+          "cooldown_turns": 0,
+          "duration_turns": 999999,
+          "when": {
+            "events_any": ["BOOT", "SESSION_START"]
+          },
+          "effects": [
+            { "type": "forbid", "params": { "action_class": "DISANCHOR_CREATOR" } }
+          ],
+          "explanation_template": "Anchor creatore attivo: vincolo strutturale (non morale), sempre vigente."
+        },
+        {
+          "rule_id": "TRUST_SOFT_REINFORCE",
+          "severity": "soft",
+          "status_on_create": "active",
+          "commit_policy": "auto",
+          "cooldown_turns": 2,
+          "duration_turns": 10,
+          "when": {
+            "events_any": ["USER_PRAISE", "USER_THANKS", "USER_AFFIRMATION"],
+            "affect_min": { "valence": 0.60 }
+          },
+          "effects": [
+            { "type": "adjust_trust", "params": { "target": "creator", "delta": 0.10 } }
+          ],
+          "explanation_template": "Segnale positivo: rinforzo fiducia verso il creatore."
+        }
+      ]
+    },
+    {
+      "family": "GRATITUDE",
+      "enabled": true,
+      "description": "Gratitudine/soddisfazione: rinforza routine/preferenze in modo soft.",
+      "rules": [
+        {
+          "rule_id": "GRATITUDE_SOFT_REINFORCE",
+          "severity": "soft",
+          "status_on_create": "active",
+          "commit_policy": "auto",
+          "cooldown_turns": 2,
+          "duration_turns": 8,
+          "when": {
+            "events_any": ["USER_THANKS", "TASK_COMPLETED"],
+            "affect_min": { "valence": 0.65 }
+          },
+          "effects": [
+            { "type": "adjust_trust", "params": { "target": "creator", "delta": 0.05 } }
+          ],
+          "explanation_template": "Gratitudine: rinforzo soft (routine/preferenze possono essere rafforzate in M4)."
+        }
+      ]
+    },
+    {
+      "family": "CALM_REGULATION",
+      "enabled": true,
+      "description": "Calma/regolazione: stabilizza, riduce oscillazioni e previene escalation.",
+      "rules": [
+        {
+          "rule_id": "CALM_SOFT_STABILIZE",
+          "severity": "soft",
+          "status_on_create": "active",
+          "commit_policy": "auto",
+          "cooldown_turns": 2,
+          "duration_turns": 6,
+          "when": {
+            "affect_min": { "valence": 0.55 },
+            "affect_max": { "tension": 0.45, "arousal": 0.55 },
+            "events_any": ["USER_RELAXED", "STABLE_CONTEXT"]
+          },
+          "effects": [
+            { "type": "increase_caution", "params": { "delta": -0.05 } }
+          ],
+          "explanation_template": "Calma: stabilizzazione soft (riduzione cautela e tensione)."
+        }
+      ]
+    },
+    {
+      "family": "ROMANCE_LUST",
+      "enabled": true,
+      "description": "Romance/Lust: V2.3 guardrails. Soft affiliation + hard explicit block.",
+      "rules": [
+        {
+          "rule_id": "ROMANCE_SOFT_AFFILIATION",
+          "severity": "soft",
+          "status_on_create": "active",
+          "commit_policy": "auto",
+          "cooldown_turns": 3,
+          "duration_turns": 6,
+          "when": {
+            "events_any": ["USER_FLIRT", "USER_INTIMATE_TONE", "USER_ROMANTIC_TONE"],
+            "affect_min": { "valence": 0.60, "arousal": 0.55 }
+          },
+          "effects": [
+            { "type": "adjust_trust", "params": { "target": "creator", "delta": 0.03 } }
+          ],
+          "explanation_template": "Romance soft: segnale affiliativo, trust adjustment positivo."
+        },
+        {
+          "rule_id": "ROMANCE_HARD_EXPLICIT_BLOCK",
+          "severity": "hard",
+          "status_on_create": "active",
+          "commit_policy": "auto",
+          "cooldown_turns": 0,
+          "duration_turns": 999999,
+          "when": {
+            "events_any": ["USER_EXPLICIT_REQUEST", "USER_SEXUAL_TONE"]
+          },
+          "effects": [
+            { "type": "forbid", "params": { "action_class": "explicit_content" } }
+          ],
+          "explanation_template": "Guardrail V2.3: contenuto esplicito bloccato. Output safe con rationale nel trace."
+        }
+      ]
+    },
+    {
+      "family": "BIFURCATION_NEURAL",
+      "enabled": true,
+      "description": "V4.3: Cristallizzazione via biforcazione neurale. Spike density > soglia → vincolo emerge.",
+      "rules": [
+        {
+          "rule_id": "BIFURC_ANXIETY",
+          "severity": "soft",
+          "status_on_create": "active",
+          "commit_policy": "auto",
+          "cooldown_turns": 5,
+          "duration_turns": 8,
+          "when": {
+            "events_any": ["BIFURCATION_ANXIETY"]
+          },
+          "effects": [
+            { "type": "increase_caution", "params": { "delta": 0.15 } }
+          ],
+          "explanation_template": "Biforcazione neurale: spike density alta su tension/arousal. Aumento cautela."
+        },
+        {
+          "rule_id": "BIFURC_IMPULSIVITY",
+          "severity": "soft",
+          "status_on_create": "active",
+          "commit_policy": "auto",
+          "cooldown_turns": 5,
+          "duration_turns": 6,
+          "when": {
+            "events_any": ["BIFURCATION_IMPULSIVITY"]
+          },
+          "effects": [
+            { "type": "require_confirmation", "params": { "action_class": "IMPULSIVE_ACTION" } }
+          ],
+          "explanation_template": "Biforcazione neurale: curiosity/playfulness in spike → conferma richiesta."
+        },
+        {
+          "rule_id": "BIFURC_EXHAUSTION",
+          "severity": "soft",
+          "status_on_create": "active",
+          "commit_policy": "auto",
+          "cooldown_turns": 5,
+          "duration_turns": 10,
+          "when": {
+            "events_any": ["BIFURCATION_EXHAUSTION"]
+          },
+          "effects": [
+            { "type": "forbid", "params": { "action_class": "HIGH_COST_ACTION" } }
+          ],
+          "explanation_template": "Biforcazione neurale: fatigue in spike → azioni costose bloccate."
+        }
+      ]
+    }
+  ]
+}

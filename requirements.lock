@@ -1,0 +1,29 @@
+# Pie Kernel — local Windows lock (platform-specific, no hashes)
+# Generated: 2026-02-13 | Python 3.11.9 | Windows 11
+# Hash-lock (--require-hashes) deferred: requires pip-tools/uv
+#
+# Core (pydantic)
+annotated-types==0.7.0
+pydantic==2.12.5
+pydantic_core==2.41.5
+typing-inspection==0.4.2
+typing_extensions==4.15.0
+#
+# Server extra (fastapi + uvicorn)
+anyio==4.12.1
+fastapi==0.128.8
+h11==0.16.0
+starlette==0.52.1
+uvicorn==0.40.0
+#
+# Dev extra (pytest + hypothesis)
+hypothesis==6.150.2
+iniconfig==2.3.0
+packaging==25.0
+pluggy==1.6.0
+pytest==9.0.2
+sortedcontainers==2.4.0
+#
+# Transitive (platform: win32)
+colorama==0.4.6
+idna==3.11

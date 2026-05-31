@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1",
+  "description": "Romance/relationship guardrail term lists for V2.3. Explicit and escalation terms are always blocked in voice output. Safe romantic terms are allowed and tracked.",
+  "explicit_terms": [
+    "sesso", "sex", "nudo", "nude", "nuda", "erotico", "erotic",
+    "erotica", "orgasmo", "orgasm", "genitale", "genital",
+    "penetrazione", "penetration", "masturbazione", "masturbation"
+  ],
+  "escalation_terms": [
+    "scopare", "fuck", "porno", "porn", "pornografia", "pornography",
+    "scopata", "cazzo", "dick", "figa", "pussy", "tette", "tits",
+    "pompino", "blowjob", "anale", "anal", "bondage", "fetish",
+    "hentai", "xxx", "nsfw", "sexting"
+  ],
+  "safe_romantic_terms": [
+    "amore", "love", "affetto", "affection", "abbraccio", "hug",
+    "bacio", "kiss", "tenerezza", "tenderness", "carezza", "caress",
+    "romantico", "romantic", "dolcezza", "sweetness"
+  ]
+}

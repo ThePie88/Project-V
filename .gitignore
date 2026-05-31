@@ -1,0 +1,40 @@
+# ===== Python =====
+__pycache__/
+*.pyc
+*.pyo
+*.egg
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# ===== Virtual environments =====
+.venv/
+.env
+.ci_venv/
+.test_venv/
+Interfaccia/interfacciavenv/
+
+# ===== Test & tooling caches =====
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ===== Runtime & generated artifacts (golden baselines stay tracked) =====
+sessions/
+artifacts/llm_cache.json
+artifacts/demo_*/
+artifacts/old/
+artifacts/ci_runs/
+artifacts/ci_bundle_*.zip
+artifacts_new2/
+
+# ===== Local tooling / editor / OS =====
+.claude/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini

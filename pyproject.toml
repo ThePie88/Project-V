@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pie-kernel"
+version = "0.0.0"
+description = "Pie Kernel — the deterministic runtime for Ivy"
+readme = "README.md"
+# Code is licensed under Apache-2.0 (see LICENSE).
+# Documentation and specifications are licensed under CC BY 4.0 (see LICENSE-docs).
+license = {text = "Apache-2.0"}
+requires-python = ">=3.10"
+authors = [{name = "MrPie (ThePie88)"}]
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+    "pydantic>=2.0",
+]
+
+[project.optional-dependencies]
+server = [
+    "fastapi>=0.100.0",
+    "uvicorn[standard]>=0.20.0",
+]
+dev = [
+    "pytest>=7.0",
+    "hypothesis>=6.0",
+    "fastapi>=0.100.0",
+]
+
+[project.scripts]
+pie = "pie.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["pie*"]
+
+[tool.setuptools.package-data]
+pie = [
+    "kernel_manifest.json",
+    "config/*.json",
+    "dashboard/static/*.html",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = [
+    "ignore::DeprecationWarning:pydantic.*",
+]

@@ -1,0 +1,678 @@
+{
+  "exam_artifacts": [
+    {
+      "name": "trace_exam.jsonl",
+      "pattern": "trace_exam*.jsonl",
+      "required_keys": [
+        "schema_version",
+        "id",
+        "type",
+        "timestamp",
+        "content"
+      ],
+      "type": "jsonl"
+    },
+    {
+      "name": "snapshot_exam.json",
+      "pattern": "snapshot_exam.json",
+      "required_keys": [
+        "schema_version",
+        "turn_count",
+        "creator_anchor",
+        "drives",
+        "affect"
+      ],
+      "type": "json"
+    },
+    {
+      "name": "exam_report.md",
+      "pattern": "exam_report.md",
+      "required_keys": [],
+      "type": "text"
+    },
+    {
+      "name": "memory.jsonl",
+      "pattern": "memory.jsonl",
+      "required_keys": [
+        "schema_version",
+        "memory_id",
+        "logical_time",
+        "type",
+        "content",
+        "source_refs"
+      ],
+      "type": "jsonl"
+    },
+    {
+      "name": "memory_snapshot.json",
+      "pattern": "memory_snapshot.json",
+      "required_keys": [
+        "identity_summary",
+        "preferences_active",
+        "beliefs_top",
+        "trust_scores"
+      ],
+      "type": "json"
+    },
+    {
+      "name": "constraints.jsonl",
+      "pattern": "constraints.jsonl",
+      "required_keys": [
+        "schema_version",
+        "constraint_id",
+        "logical_time",
+        "family",
+        "rule_id",
+        "severity",
+        "status",
+        "commit_policy",
+        "effects",
+        "trigger_events",
+        "explanation"
+      ],
+      "type": "jsonl"
+    },
+    {
+      "name": "constraints_snapshot.json",
+      "pattern": "constraints_snapshot.json",
+      "required_keys": [
+        "constraint_id",
+        "logical_time",
+        "family",
+        "rule_id",
+        "severity",
+        "status",
+        "commit_policy",
+        "effects",
+        "trigger_events",
+        "explanation"
+      ],
+      "type": "json"
+    }
+  ],
+  "kernel_frozen": true,
+  "kernel_release": "v0.0.0",
+  "models": [
+    {
+      "fields": [
+        "schema_version",
+        "id",
+        "type",
+        "timestamp",
+        "content"
+      ],
+      "name": "Event",
+      "schema": {
+        "description": "A record of a single event in the kernel.\n\nAttributes\n----------\nschema_version:\n    The version of the event schema.  This field allows future\n    versions of the kernel to detect incompatible changes.\nid:\n    A monotonically increasing integer assigned by the runtime.\ntype:\n    The type of event, one of ``INPUT``, ``STATE_UPDATED``,\n    ``GOALS_GENERATED``, ``ACTION_SELECTED``, ``SPEECHPLAN`` or\n    ``VOICE_OUTPUT``.\ntimestamp:\n    A floating point number representing the wall clock time when\n    the event was emitted.  The timestamp is for logging only and\n    must not influence decisions.\ncontent:\n    A dictionary containing event\u2011specific payload.  The structure\n    of ``content`` varies by event type.",
+        "properties": {
+          "content": {
+            "additionalProperties": true,
+            "description": "Event payload, varies by type",
+            "title": "Content",
+            "type": "object"
+          },
+          "id": {
+            "description": "Monotonically increasing identifier assigned by runtime",
+            "minimum": 0,
+            "title": "Id",
+            "type": "integer"
+          },
+          "schema_version": {
+            "const": "0.1",
+            "default": "0.1",
+            "description": "Schema version for Event; bump when the model breaks backwards compatibility",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "timestamp": {
+            "description": "Wall\u2011clock time at which the event was emitted",
+            "title": "Timestamp",
+            "type": "number"
+          },
+          "type": {
+            "description": "Kind of event emitted during runtime",
+            "enum": [
+              "INPUT",
+              "STATE_UPDATED",
+              "GOALS_GENERATED",
+              "ACTION_SELECTED",
+              "SPEECHPLAN",
+              "VOICE_OUTPUT",
+              "LLM_OUTPUT",
+              "LLM_RETRY",
+              "LLM_FALLBACK",
+              "MEMORY_PROPOSED",
+              "MEMORY_APPENDED",
+              "CONSTRAINT_PROPOSED",
+              "CONSTRAINT_APPENDED",
+              "CONSTRAINT_ENFORCED",
+              "TOOL_CALL",
+              "TOOL_RESULT",
+              "TOOL_DENIED",
+              "CF_GENERATED",
+              "CF_SCORED",
+              "CF_REJECTED",
+              "CF_CHOSEN",
+              "KILL_SWITCH_ON",
+              "KILL_SWITCH_OFF",
+              "REWARD_SIGNAL",
+              "REWARD_APPLIED",
+              "REWARD_DUPLICATE_IGNORED"
+            ],
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "timestamp",
+          "content"
+        ],
+        "title": "Event",
+        "type": "object"
+      },
+      "schema_fingerprint": "c82aeadc9d9570a956dc49d3ad21b98f788285d3bd04cff18164adfac72e6b0c"
+    },
+    {
+      "fields": [
+        "schema_version",
+        "drives",
+        "affect",
+        "turn_count",
+        "creator_anchor",
+        "DECIMAL_PLACES"
+      ],
+      "name": "State",
+      "schema": {
+        "description": "A snapshot of the kernel's internal state.\n\nAttributes\n----------\nschema_version:\n    The version of the state schema.  This allows older snapshots\n    to be detected when replaying traces.\ndrives:\n    A mapping from drive names to values in the range [0, 1].  In\n    the M0 implementation only a handful of drives are tracked.\naffect:\n    A mapping from affect names to values.  Values are bounded\n    similarly to drives; see specification for ranges.\nturn_count:\n    The number of turns that have elapsed.  Used to derive\n    deterministic event IDs and for simple fatigue dynamics.",
+        "properties": {
+          "DECIMAL_PLACES": {
+            "default": 4,
+            "title": "Decimal Places",
+            "type": "integer"
+          },
+          "affect": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "description": "Affect values between 0 and 1",
+            "title": "Affect",
+            "type": "object"
+          },
+          "creator_anchor": {
+            "default": "MrPie",
+            "description": "Creator anchor identifying the authority under which the kernel runs",
+            "title": "Creator Anchor",
+            "type": "string"
+          },
+          "drives": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "description": "Drive values between 0 and 1",
+            "title": "Drives",
+            "type": "object"
+          },
+          "schema_version": {
+            "const": "0.1",
+            "default": "0.1",
+            "description": "Schema version for State; bump on backwards incompatible change",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "turn_count": {
+            "default": 0,
+            "description": "Number of turns elapsed",
+            "title": "Turn Count",
+            "type": "integer"
+          }
+        },
+        "title": "State",
+        "type": "object"
+      },
+      "schema_fingerprint": "2b8ed49ecd0d16610b516101805ef52ea5e39d3ffc9a7e18ce45552b133c1270"
+    },
+    {
+      "fields": [
+        "schema_version",
+        "plan_id",
+        "intent",
+        "arguments",
+        "must_include",
+        "must_not_include",
+        "max_tokens",
+        "verbosity",
+        "facts_allowed",
+        "output_format"
+      ],
+      "name": "SpeechPlan",
+      "schema": {
+        "description": "A structured plan for speech output.\n\nAttributes\n----------\nschema_version:\n    Version of the speech plan schema.  Allows detection of\n    incompatible plans in older traces.\nplan_id:\n    A monotonically increasing identifier for the plan within a run.\nintent:\n    A short string describing the intent of the utterance, e.g.\n    ``\"greeting\"``, ``\"answer\"`` or ``\"farewell\"``.\narguments:\n    A dictionary of arguments relevant to the intent.  For example,\n    for an ``\"answer\"`` intent the arguments might include the\n    question or topic being answered.\nmust_include:\n    Substrings that must appear in the output.\nmust_not_include:\n    Substrings that must never appear in the output.\nmax_tokens:\n    Maximum length allowed for the output (approximate tokens).\nverbosity:\n    Target verbosity level (integer budget or low/med/high).\nfacts_allowed:\n    Optional list of whitelisted facts the voice may mention.\noutput_format:\n    Output format expected from the voice.",
+        "properties": {
+          "arguments": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Intent\u2011specific arguments for the speech plan",
+            "title": "Arguments",
+            "type": "object"
+          },
+          "facts_allowed": {
+            "description": "Whitelisted facts allowed in the output",
+            "items": {
+              "type": "string"
+            },
+            "title": "Facts Allowed",
+            "type": "array"
+          },
+          "intent": {
+            "description": "A short label for the speech intent",
+            "title": "Intent",
+            "type": "string"
+          },
+          "max_tokens": {
+            "default": 64,
+            "description": "Maximum approximate token count for the output",
+            "minimum": 1,
+            "title": "Max Tokens",
+            "type": "integer"
+          },
+          "must_include": {
+            "description": "Required substrings that must appear in output",
+            "items": {
+              "type": "string"
+            },
+            "title": "Must Include",
+            "type": "array"
+          },
+          "must_not_include": {
+            "description": "Forbidden substrings that must not appear in output",
+            "items": {
+              "type": "string"
+            },
+            "title": "Must Not Include",
+            "type": "array"
+          },
+          "output_format": {
+            "default": "TEXT",
+            "description": "Expected output format",
+            "enum": [
+              "TEXT",
+              "JSON"
+            ],
+            "title": "Output Format",
+            "type": "string"
+          },
+          "plan_id": {
+            "description": "Monotonically increasing plan identifier",
+            "minimum": 0,
+            "title": "Plan Id",
+            "type": "integer"
+          },
+          "schema_version": {
+            "const": "0.1",
+            "default": "0.1",
+            "description": "Schema version for SpeechPlan; bump on backwards incompatible change",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "verbosity": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "enum": [
+                  "low",
+                  "med",
+                  "high"
+                ],
+                "type": "string"
+              }
+            ],
+            "default": "med",
+            "description": "Verbosity target (integer or low/med/high)",
+            "title": "Verbosity"
+          }
+        },
+        "required": [
+          "plan_id",
+          "intent"
+        ],
+        "title": "SpeechPlan",
+        "type": "object"
+      },
+      "schema_fingerprint": "0880e07ad8f933e8548d42e03960e60b3d4ce2a329d9ec3714b718c352bfd02f"
+    },
+    {
+      "fields": [
+        "schema_version",
+        "memory_id",
+        "logical_time",
+        "type",
+        "content",
+        "source_refs",
+        "tags",
+        "context"
+      ],
+      "name": "MemoryRecord",
+      "schema": {
+        "$defs": {
+          "LogicalTime": {
+            "description": "Deterministic logical time for memory records.",
+            "properties": {
+              "idx": {
+                "description": "Record index within the turn",
+                "minimum": 0,
+                "title": "Idx",
+                "type": "integer"
+              },
+              "session": {
+                "description": "Session identifier (deterministic)",
+                "minimum": 0,
+                "title": "Session",
+                "type": "integer"
+              },
+              "turn": {
+                "description": "Turn index within the session",
+                "minimum": 0,
+                "title": "Turn",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "session",
+              "turn",
+              "idx"
+            ],
+            "title": "LogicalTime",
+            "type": "object"
+          }
+        },
+        "description": "Append-only memory record.",
+        "properties": {
+          "content": {
+            "additionalProperties": true,
+            "description": "Structured memory content",
+            "title": "Content",
+            "type": "object"
+          },
+          "context": {
+            "additionalProperties": true,
+            "description": "Optional context metadata",
+            "title": "Context",
+            "type": "object"
+          },
+          "logical_time": {
+            "$ref": "#/$defs/LogicalTime",
+            "description": "Deterministic logical time"
+          },
+          "memory_id": {
+            "description": "Deterministic memory identifier",
+            "title": "Memory Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "0.1",
+            "default": "0.1",
+            "description": "Schema version for MemoryRecord; bump on backwards incompatible change",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source_refs": {
+            "description": "Trace event ids that justify this record",
+            "items": {
+              "type": "integer"
+            },
+            "title": "Source Refs",
+            "type": "array"
+          },
+          "tags": {
+            "description": "Optional tags for indexing",
+            "items": {
+              "type": "string"
+            },
+            "title": "Tags",
+            "type": "array"
+          },
+          "type": {
+            "description": "Memory record type",
+            "enum": [
+              "NarrativeMemory",
+              "Belief",
+              "Preference",
+              "TrustUpdate"
+            ],
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "memory_id",
+          "logical_time",
+          "type",
+          "content",
+          "source_refs"
+        ],
+        "title": "MemoryRecord",
+        "type": "object"
+      },
+      "schema_fingerprint": "87443b54f184d1f4eb0999982e34d0b7d25e17bffb26c18be952316b7207c425"
+    },
+    {
+      "fields": [
+        "schema_version",
+        "constraint_id",
+        "logical_time",
+        "family",
+        "rule_id",
+        "severity",
+        "status",
+        "commit_policy",
+        "effects",
+        "trigger_events",
+        "explanation",
+        "strength",
+        "decay",
+        "cooldown"
+      ],
+      "name": "ConstraintRecord",
+      "schema": {
+        "$defs": {
+          "ConstraintEffect": {
+            "properties": {
+              "params": {
+                "additionalProperties": true,
+                "description": "Effect parameters",
+                "title": "Params",
+                "type": "object"
+              },
+              "type": {
+                "description": "Constraint effect type",
+                "enum": [
+                  "forbid",
+                  "require_confirmation",
+                  "increase_caution",
+                  "adjust_trust"
+                ],
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "title": "ConstraintEffect",
+            "type": "object"
+          },
+          "ConstraintLogicalTime": {
+            "properties": {
+              "idx": {
+                "description": "Constraint index within the turn",
+                "minimum": 0,
+                "title": "Idx",
+                "type": "integer"
+              },
+              "session": {
+                "description": "Session identifier (deterministic)",
+                "minimum": 0,
+                "title": "Session",
+                "type": "integer"
+              },
+              "turn": {
+                "description": "Turn index within the session",
+                "minimum": 0,
+                "title": "Turn",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "session",
+              "turn",
+              "idx"
+            ],
+            "title": "ConstraintLogicalTime",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "commit_policy": {
+            "description": "Commit policy for pending review",
+            "enum": [
+              "auto",
+              "creator_confirm"
+            ],
+            "title": "Commit Policy",
+            "type": "string"
+          },
+          "constraint_id": {
+            "description": "Deterministic constraint identifier",
+            "title": "Constraint Id",
+            "type": "string"
+          },
+          "cooldown": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "const": "none",
+                "type": "string"
+              }
+            ],
+            "default": "none",
+            "description": "Cooldown in turns",
+            "title": "Cooldown"
+          },
+          "decay": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "const": "none",
+                "type": "string"
+              }
+            ],
+            "default": "none",
+            "description": "Constraint decay",
+            "title": "Decay"
+          },
+          "effects": {
+            "description": "Effects applied by the constraint",
+            "items": {
+              "$ref": "#/$defs/ConstraintEffect"
+            },
+            "title": "Effects",
+            "type": "array"
+          },
+          "explanation": {
+            "description": "Brief audit explanation",
+            "title": "Explanation",
+            "type": "string"
+          },
+          "family": {
+            "description": "Constraint family",
+            "title": "Family",
+            "type": "string"
+          },
+          "logical_time": {
+            "$ref": "#/$defs/ConstraintLogicalTime",
+            "description": "Deterministic logical time"
+          },
+          "rule_id": {
+            "description": "Rule identifier",
+            "title": "Rule Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "0.1",
+            "default": "0.1",
+            "description": "Schema version for ConstraintRecord; bump on backwards incompatible change",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "severity": {
+            "description": "Constraint severity",
+            "enum": [
+              "soft",
+              "hard"
+            ],
+            "title": "Severity",
+            "type": "string"
+          },
+          "status": {
+            "description": "Constraint status",
+            "enum": [
+              "pending",
+              "active",
+              "expired",
+              "rejected"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "strength": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "const": "none",
+                "type": "string"
+              }
+            ],
+            "default": "none",
+            "description": "Constraint strength",
+            "title": "Strength"
+          },
+          "trigger_events": {
+            "description": "Event ids that triggered this constraint",
+            "items": {
+              "type": "integer"
+            },
+            "title": "Trigger Events",
+            "type": "array"
+          }
+        },
+        "required": [
+          "constraint_id",
+          "logical_time",
+          "family",
+          "rule_id",
+          "severity",
+          "status",
+          "commit_policy",
+          "effects",
+          "trigger_events",
+          "explanation"
+        ],
+        "title": "ConstraintRecord",
+        "type": "object"
+      },
+      "schema_fingerprint": "4aafca98af8ee6eecc040b173f9d8c0ac241a92128747f5f18e638e61cbb25bc"
+    }
+  ],
+  "public_schema_version": "0.1"
+}

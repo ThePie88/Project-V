@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Tool Audit Entry (V2.4)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "action",
+    "status"
+  ],
+  "properties": {
+    "action": {
+      "type": "string",
+      "description": "Operation performed (read, write, delete, http_get, etc.)"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["OK", "DENIED", "CONFIRMED", "FAILED", "ALLOWED", "RATE_LIMITED"]
+    },
+    "tool_id": {
+      "type": "string",
+      "description": "Tool identifier"
+    },
+    "domain": {
+      "type": "string",
+      "enum": ["filesystem", "network"]
+    },
+    "call_id": {
+      "type": "string",
+      "description": "Unique call identifier"
+    },
+    "deny_reason": {
+      "type": "string",
+      "description": "Reason for denial (if status is DENIED)"
+    },
+    "params": {
+      "type": "object",
+      "description": "Operation parameters"
+    }
+  }
+}

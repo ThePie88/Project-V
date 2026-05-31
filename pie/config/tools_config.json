@@ -1,0 +1,26 @@
+{
+  "schema_version": "0.1",
+  "description": "Tool configuration for V2.4 — allowlists, capabilities, rate limits.",
+  "network_allowlist": ["localhost", "127.0.0.1", "api.example.com"],
+  "fs_sandbox_root": "sandbox/",
+  "fs_capabilities": ["read", "write", "list", "mkdir"],
+  "destructive_operations": ["delete", "move", "http_post", "http_delete"],
+  "rate_limits": {
+    "per_turn": 5,
+    "per_session": 50
+  },
+  "tool_capabilities": [
+    {
+      "tool_id": "fs_sandbox",
+      "domain": "filesystem",
+      "allowed_operations": ["read", "write", "list", "mkdir", "move", "delete"],
+      "requires_confirmation": ["delete", "move"]
+    },
+    {
+      "tool_id": "http_client",
+      "domain": "network",
+      "allowed_operations": ["http_get"],
+      "requires_confirmation": ["http_post", "http_delete"]
+    }
+  ]
+}

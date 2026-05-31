@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ReadoutWeights",
+  "description": "V6a-R2: Trained ridge-regression readout weights for ESN reservoir.",
+  "type": "object",
+  "required": [
+    "schema_version", "feature_dim", "channels", "weights",
+    "mean_X", "std_X", "lambda_reg", "seed", "dataset_id",
+    "oracle_version", "n_samples_train", "n_samples_test", "metrics"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0" },
+    "feature_dim": { "type": "integer", "minimum": 1 },
+    "channels": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 5,
+      "maxItems": 5
+    },
+    "weights": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": { "type": "number" }
+      },
+      "minItems": 5,
+      "maxItems": 5
+    },
+    "mean_X": {
+      "type": "array",
+      "items": { "type": "number" }
+    },
+    "std_X": {
+      "type": "array",
+      "items": { "type": "number" }
+    },
+    "lambda_reg": { "type": "number", "exclusiveMinimum": 0 },
+    "seed": { "type": "integer" },
+    "dataset_id": { "type": "string", "minLength": 64, "maxLength": 64 },
+    "oracle_version": { "type": "string" },
+    "n_samples_train": { "type": "integer", "minimum": 1 },
+    "n_samples_test": { "type": "integer", "minimum": 1 },
+    "metrics": {
+      "type": "object",
+      "patternProperties": {
+        ".*": {
+          "type": "object",
+          "properties": {
+            "mae": { "type": "number" },
+            "r_squared": { "type": "number" },
+            "accuracy": { "type": "number" }
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

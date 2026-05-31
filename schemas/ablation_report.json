@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AblationReport",
+  "description": "V6a-R1: Ablation study results — 3 conditions × 2+ tasks.",
+  "type": "object",
+  "required": ["schema_version", "seed", "results"],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "seed": { "type": "integer" },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["condition", "task", "metric_name", "metric_value", "feature_dim"],
+        "properties": {
+          "condition": { "type": "string" },
+          "task": { "type": "string" },
+          "metric_name": { "type": "string" },
+          "metric_value": { "type": "number" },
+          "feature_dim": { "type": "integer" },
+          "config": { "type": ["object", "null"] }
+        }
+      }
+    }
+  }
+}

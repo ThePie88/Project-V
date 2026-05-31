@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pie Kernel — Live Demo</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --border: #2a2d3a;
+      --text: #e1e4ed;
+      --muted: #8b8fa3;
+      --accent: #6c8aff;
+      --green: #4ade80;
+      --red: #f87171;
+      --yellow: #fbbf24;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      max-width: 800px;
+      width: 100%;
+      padding: 40px 24px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    header h1 {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    header .accent { color: var(--accent); }
+    header p {
+      color: var(--muted);
+      font-size: 16px;
+    }
+    .version {
+      display: inline-block;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+      font-family: monospace;
+    }
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+    .step {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .step-num {
+      background: var(--accent);
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .step-content h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .step-content p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .tag-green { background: rgba(74,222,128,0.15); color: var(--green); }
+    .tag-red { background: rgba(248,113,113,0.15); color: var(--red); }
+    .tag-blue { background: rgba(108,138,255,0.15); color: var(--accent); }
+    .tag-yellow { background: rgba(251,191,36,0.15); color: var(--yellow); }
+    .look-for {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 48px;
+    }
+    .look-for h2 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--accent);
+    }
+    .look-for ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .look-for li {
+      font-size: 14px;
+      padding-left: 20px;
+      position: relative;
+    }
+    .look-for li::before {
+      content: "\25B6";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-size: 10px;
+      top: 3px;
+    }
+    .dashboard-link {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .dashboard-link a {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+      padding: 12px 32px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+    .dashboard-link a:hover { opacity: 0.85; }
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 24px;
+      border-top: 1px solid var(--border);
+      width: 100%;
+      margin-top: auto;
+    }
+    footer code {
+      font-family: monospace;
+      background: var(--surface);
+      padding: 1px 6px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Pie Kernel <span class="accent">Live Demo</span></h1>
+      <p>Runtime deterministico per Ivy &mdash; prova visiva end-to-end</p>
+      <span class="version">kernel v0.0.0 &middot; frozen</span>
+    </header>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Creazione sessione</h3>
+          <p>Il runner crea una sessione dal seed <code>SEED_V0</code>. Se LMStudio &egrave; attivo usa il modello reale, altrimenti FakeLLM deterministico.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>6 turni con input mirati</h3>
+          <p>Ogni turno attiva un aspetto diverso del kernel: memoria <span class="tag tag-blue">Preference</span>, tool use <span class="tag tag-green">ALLOWED</span> / <span class="tag tag-red">DENIED</span>, credenze <span class="tag tag-blue">Belief</span>, recall episodico.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Tool sandbox</h3>
+          <p>Turno 3: scrittura file nella sandbox &rarr; <span class="tag tag-green">TOOL_RESULT</span>. Turno 4: lettura path assoluto fuori sandbox &rarr; <span class="tag tag-red">TOOL_DENIED</span>. Il gating CV pre-LLM controlla <code>tool_gate &ge; 0.3</code>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h3>Reward R-STDP</h3>
+          <p>Due segnali di reward <span class="tag tag-yellow">+1</span> inviati inline (dopo turno 2 e dopo turno 5). L'effetto si applica al turno successivo via step 1.5 del runtime loop.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h3>Dashboard live</h3>
+          <p>Si apre automaticamente con la sessione pre-selezionata. Mostra: CV channels, spike rate, gating decisions, tool stats, memory counts, budget.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <h3>Proof folder</h3>
+          <p>Tutti i log vengono copiati in <code>artifacts/demo_&lt;timestamp&gt;/</code> con un <code>demo_summary.json</code> contenente decision hash, conteggi eventi e metadata del modello.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="look-for">
+      <h2>Cosa cercare nella dashboard</h2>
+      <ul>
+        <li><strong>Control Vector Channels</strong> &mdash; 5 linee colorate che evolvono sui 6 turni (memory_gate, cf_k, verbosity_bias, tool_gate, consolidation_urgency)</li>
+        <li><strong>Spike Rate</strong> &mdash; pattern di firing dei 10 neuroni Izhikevich</li>
+        <li><strong>CV Gating</strong> &mdash; tabella con ~29 decisioni ALLOW/BLOCK per canale per turno</li>
+        <li><strong>Tool Stats</strong> &mdash; conteggio chiamate, denied, deny rate %</li>
+        <li><strong>Memory Counts</strong> &mdash; Preference, Belief, NarrativeMemory per tipo</li>
+        <li><strong>Budget</strong> &mdash; consumo progressivo su 6 turni, remaining %</li>
+        <li><strong>State</strong> &mdash; drives (bonding, autonomy, curiosity, safety, competence) + affect</li>
+      </ul>
+    </div>
+
+    <div class="dashboard-link">
+      <a href="http://127.0.0.1:8080">Apri Dashboard</a>
+    </div>
+  </div>
+
+  <footer>
+    Pie Kernel <code>v0.0.0</code> &middot; Orchestrazione demo, non codice kernel &middot; Dashboard: <code>http://127.0.0.1:8080</code>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Policy Verify",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "expected"
+  ],
+  "properties": {
+    "status": {
+      "type": "string"
+    },
+    "expected": {
+      "type": "string"
+    }
+  }
+}

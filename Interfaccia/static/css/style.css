@@ -1,0 +1,538 @@
+/* Pie Neural Interface - CINEMATIC EDITION */
+
+:root {
+    --bg-space: #020205;
+    --bg-panel: rgba(20, 15, 5, 0.7);
+    --text-primary: #fff8e7;
+    --text-secondary: #8a7a6a;
+    --accent-gold: #ffb700;
+    --accent-amber: #ff9100;
+    --accent-red: #ff2a6d;
+    --accent-gold: #ffb700;
+    --accent-bronze: #cd7f32;
+    --accent-green: #76ff03;
+    --scanline-color: rgba(255, 183, 0, 0.03);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+body {
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    background: var(--bg-space);
+    color: var(--text-primary);
+    overflow: hidden;
+    height: 100vh;
+}
+
+/* Scanlines Overlay */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        var(--scanline-color) 2px,
+        var(--scanline-color) 4px
+    );
+    pointer-events: none;
+    z-index: 1000;
+    animation: scanlineMove 10s linear infinite;
+}
+
+@keyframes scanlineMove {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(4px); }
+}
+
+/* Vignette */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+        ellipse at center,
+        transparent 0%,
+        transparent 50%,
+        rgba(0,0,0,0.6) 100%
+    );
+    pointer-events: none;
+    z-index: 999;
+}
+
+#container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* Canvas */
+#canvas-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    filter: contrast(1.1) saturate(1.2);
+}
+
+/* HUD Top - Floating 3D Style */
+#hud-top {
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 50px;
+    z-index: 10;
+    background: linear-gradient(180deg, 
+        rgba(0,217,255,0.1) 0%, 
+        rgba(0,217,255,0.05) 50%,
+        transparent 100%);
+    padding: 20px 40px;
+    border: 1px solid rgba(0,217,255,0.2);
+    border-bottom: 2px solid var(--accent-gold);
+    backdrop-filter: blur(20px);
+    clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
+    animation: hudPulse 4s ease-in-out infinite;
+}
+
+@keyframes hudPulse {
+    0%, 100% { border-color: rgba(0,217,255,0.2); }
+    50% { border-color: rgba(0,217,255,0.5); }
+}
+
+.hud-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+}
+
+.hud-item::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+    opacity: 0.5;
+}
+
+.hud-item .label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.hud-item .value {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--accent-gold);
+    text-shadow: 
+        0 0 10px var(--accent-gold),
+        0 0 20px var(--accent-gold),
+        0 0 40px var(--accent-gold);
+    animation: textFlicker 3s infinite;
+}
+
+@keyframes textFlicker {
+    0%, 95%, 98% { opacity: 1; }
+    96%, 99% { opacity: 0.8; }
+}
+
+/* Glitch effect for values */
+.glitch {
+    animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+}
+
+@keyframes glitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+    100% { transform: translate(0); }
+}
+
+/* Kill Switch - Industrial Design */
+#kill-switch {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    z-index: 100;
+    background: 
+        linear-gradient(135deg, rgba(255,42,109,0.2) 0%, rgba(255,42,109,0.05) 100%),
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 10px,
+            rgba(255,42,109,0.1) 10px,
+            rgba(255,42,109,0.1) 20px
+        );
+    border: 2px solid var(--accent-red);
+    color: var(--accent-red);
+    padding: 20px 30px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    letter-spacing: 3px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    text-shadow: 0 0 10px var(--accent-red);
+    box-shadow: 
+        0 0 20px rgba(255, 42, 109, 0.3),
+        inset 0 0 20px rgba(255, 42, 109, 0.1);
+    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+}
+
+#kill-switch:hover {
+    background: rgba(255, 42, 109, 0.3);
+    box-shadow: 
+        0 0 40px rgba(255, 42, 109, 0.6),
+        0 0 80px rgba(255, 42, 109, 0.4),
+        inset 0 0 30px rgba(255, 42, 109, 0.2);
+    transform: scale(1.05);
+    animation: killSwitchPulse 0.5s ease infinite;
+}
+
+@keyframes killSwitchPulse {
+    0%, 100% { box-shadow: 0 0 40px rgba(255, 42, 109, 0.6); }
+    50% { box-shadow: 0 0 60px rgba(255, 42, 109, 0.8); }
+}
+
+#kill-switch:active {
+    transform: scale(0.95);
+}
+
+/* Test Panel - Glass Morphism */
+#test-panel {
+    position: absolute;
+    left: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background: 
+        linear-gradient(135deg, rgba(0,217,255,0.08) 0%, rgba(0,0,0,0.4) 100%);
+    padding: 25px;
+    border: 1px solid rgba(0,217,255,0.15);
+    border-left: 3px solid var(--accent-gold);
+    backdrop-filter: blur(20px) saturate(180%);
+    width: 240px;
+    clip-path: polygon(0 0, 100% 5%, 100% 95%, 0 100%);
+}
+
+#test-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 50px,
+            rgba(0,217,255,0.02) 50px,
+            rgba(0,217,255,0.02) 51px
+        );
+    pointer-events: none;
+}
+
+#test-panel h3 {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--accent-gold);
+    margin-bottom: 25px;
+    text-align: center;
+    text-shadow: 0 0 10px var(--accent-gold);
+    border-bottom: 1px solid rgba(0,217,255,0.2);
+    padding-bottom: 15px;
+}
+
+.test-btn {
+    width: 100%;
+    padding: 18px 15px;
+    margin-bottom: 12px;
+    background: 
+        linear-gradient(90deg, 
+            rgba(0,217,255,0.05) 0%, 
+            rgba(0,217,255,0.02) 50%,
+            transparent 100%);
+    border: 1px solid rgba(0,217,255,0.2);
+    border-left: 3px solid var(--accent-gold);
+    color: var(--text-primary);
+    cursor: pointer;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+}
+
+.test-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(0,217,255,0.2), 
+        transparent);
+    transition: left 0.5s;
+}
+
+.test-btn:hover::before {
+    left: 100%;
+}
+
+.test-btn:hover {
+    background: rgba(0,217,255,0.15);
+    border-color: var(--accent-gold);
+    transform: translateX(8px);
+    box-shadow: 
+        -5px 0 20px rgba(0,217,255,0.3),
+        0 0 30px rgba(0,217,255,0.1);
+}
+
+.test-btn.pattern {
+    border-left-color: var(--accent-amber);
+}
+
+.test-btn.pattern:hover {
+    border-color: var(--accent-amber);
+    box-shadow: 
+        -5px 0 20px rgba(255,145,0,0.3),
+        0 0 30px rgba(255,145,0,0.1);
+}
+
+.test-btn.memory {
+    border-left-color: var(--accent-gold);
+}
+
+.test-btn.memory:hover {
+    border-color: var(--accent-gold);
+    box-shadow: 
+        -5px 0 20px rgba(255,215,0,0.3),
+        0 0 30px rgba(255,215,0,0.1);
+}
+
+.test-btn.overload {
+    border-left-color: var(--accent-red);
+    background: linear-gradient(90deg, 
+        rgba(255,42,109,0.05) 0%, 
+        transparent 100%);
+}
+
+.test-btn.overload:hover {
+    border-color: var(--accent-red);
+    background: rgba(255,42,109,0.15);
+    box-shadow: 
+        -5px 0 20px rgba(255,42,109,0.4),
+        0 0 40px rgba(255,42,109,0.2);
+    animation: btnDangerPulse 0.5s ease infinite;
+}
+
+@keyframes btnDangerPulse {
+    0%, 100% { border-color: var(--accent-red); }
+    50% { border-color: #ff6b9d; }
+}
+
+.btn-icon {
+    font-size: 20px;
+    filter: drop-shadow(0 0 5px currentColor);
+}
+
+/* Neuron Info Panel - Holographic */
+#neuron-info {
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background: 
+        linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(0,0,0,0.6) 100%);
+    padding: 25px;
+    border: 1px solid var(--accent-gold);
+    border-right: 3px solid var(--accent-gold);
+    backdrop-filter: blur(20px);
+    width: 280px;
+    clip-path: polygon(5% 0, 100% 0, 100% 100%, 0 95%);
+    box-shadow: 
+        0 0 30px rgba(255,215,0,0.2),
+        inset 0 0 30px rgba(255,215,0,0.05);
+}
+
+#neuron-info.hidden {
+    display: none;
+}
+
+#neuron-info::before {
+    content: '◆ NEURAL DATA';
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    background: var(--bg-space);
+    padding: 0 10px;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--accent-gold);
+}
+
+#neuron-info h4 {
+    color: var(--accent-gold);
+    font-size: 14px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255,215,0,0.3);
+    text-shadow: 0 0 10px rgba(255,215,0,0.5);
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.info-row span:first-child {
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.info-row span:last-child {
+    color: var(--text-primary);
+    font-weight: bold;
+    text-shadow: 0 0 5px currentColor;
+}
+
+/* Status Log - Terminal Style */
+#status-log {
+    position: absolute;
+    bottom: 30px;
+    left: 30px;
+    right: 30px;
+    height: 120px;
+    z-index: 10;
+    background: 
+        linear-gradient(180deg, 
+            rgba(0,0,0,0.8) 0%, 
+            rgba(5,10,20,0.9) 100%);
+    padding: 15px 20px;
+    border: 1px solid rgba(0,217,255,0.1);
+    border-top: 2px solid var(--accent-gold);
+    font-size: 10px;
+    overflow-y: auto;
+    clip-path: polygon(0 0, 100% 0, 98% 100%, 2% 100%);
+}
+
+#status-log::before {
+    content: '◈ SYSTEM LOG';
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    background: var(--bg-space);
+    padding: 0 10px;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--accent-gold);
+}
+
+.log-entry {
+    margin-bottom: 6px;
+    color: var(--text-secondary);
+    border-left: 2px solid var(--accent-gold);
+    padding-left: 12px;
+    animation: logEntry 0.3s ease-out;
+    text-shadow: 0 0 2px currentColor;
+}
+
+.log-entry:nth-child(odd) {
+    border-left-color: var(--accent-amber);
+}
+
+.log-entry.alert {
+    border-left-color: var(--accent-red);
+    color: var(--accent-red);
+    animation: logAlert 0.5s ease-out;
+}
+
+@keyframes logEntry {
+    from { 
+        opacity: 0; 
+        transform: translateX(-10px);
+    }
+    to { 
+        opacity: 1; 
+        transform: translateX(0);
+    }
+}
+
+@keyframes logAlert {
+    0%, 100% { text-shadow: 0 0 5px var(--accent-red); }
+    50% { text-shadow: 0 0 20px var(--accent-red), 0 0 40px var(--accent-red); }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.5);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--accent-gold);
+    border-radius: 3px;
+    box-shadow: 0 0 5px var(--accent-gold);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #fff;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    #hud-top {
+        gap: 30px;
+        padding: 15px 25px;
+    }
+    
+    #test-panel, #neuron-info {
+        width: 200px;
+    }
+}
+
+@media (max-width: 900px) {
+    #test-panel, #neuron-info {
+        display: none;
+    }
+}

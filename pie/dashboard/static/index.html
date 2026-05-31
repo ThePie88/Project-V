@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ivy Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --border: #2a2d3a;
+      --text: #e1e4ed;
+      --muted: #8b8fa3;
+      --accent: #6c8aff;
+      --green: #4ade80;
+      --red: #f87171;
+      --yellow: #fbbf24;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    header h1 { font-size: 20px; font-weight: 600; }
+    header select {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    #status {
+      margin-left: auto;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+      gap: 16px;
+      padding: 16px 24px;
+    }
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .panel h2 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+    .metric { font-size: 28px; font-weight: 700; }
+    .metric-row {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .metric-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .metric-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .metric-value { font-size: 22px; font-weight: 700; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th {
+      text-align: left;
+      padding: 6px 8px;
+      color: var(--muted);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 6px 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .tag-allow { background: rgba(74,222,128,0.15); color: var(--green); }
+    .tag-block { background: rgba(248,113,113,0.15); color: var(--red); }
+    .empty-state {
+      color: var(--muted);
+      font-style: italic;
+      text-align: center;
+      padding: 24px;
+    }
+    canvas { max-height: 250px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Ivy Dashboard</h1>
+    <select id="sessionSelect">
+      <option value="">-- select session --</option>
+    </select>
+    <span id="status">Ready</span>
+  </header>
+
+  <div class="grid">
+    <!-- State Panel -->
+    <div class="panel" id="statePanel">
+      <h2>State (Drives + Affect)</h2>
+      <div id="stateContent" class="empty-state">Select a session</div>
+    </div>
+
+    <!-- Budget Panel -->
+    <div class="panel">
+      <h2>Budget</h2>
+      <div id="budgetMetrics" class="metric-row"></div>
+      <canvas id="budgetChart"></canvas>
+    </div>
+
+    <!-- CV Channels Panel -->
+    <div class="panel">
+      <h2>Control Vector Channels</h2>
+      <canvas id="cvChart"></canvas>
+    </div>
+
+    <!-- Spike Rate Panel -->
+    <div class="panel">
+      <h2>Spike Rate</h2>
+      <canvas id="spikeChart"></canvas>
+    </div>
+
+    <!-- Gating Table Panel -->
+    <div class="panel" style="grid-column: span 2;">
+      <h2>CV Gating Decisions</h2>
+      <div id="gatingContent" class="empty-state">No data</div>
+    </div>
+
+    <!-- Tool Stats Panel -->
+    <div class="panel">
+      <h2>Tool Stats</h2>
+      <div id="toolContent" class="empty-state">No data</div>
+    </div>
+
+    <!-- Memory Panel -->
+    <div class="panel">
+      <h2>Memory Counts</h2>
+      <div id="memoryContent" class="empty-state">No data</div>
+    </div>
+  </div>
+
+  <script>
+    const API = '';
+    let charts = {};
+
+    // -- Init --
+    async function init() {
+      const res = await fetch(`${API}/api/sessions`);
+      const sessions = await res.json();
+      const sel = document.getElementById('sessionSelect');
+      sessions.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.session_id;
+        opt.textContent = `${s.session_id} (turns: ${s.turn_count || 0})`;
+        sel.appendChild(opt);
+      });
+      sel.addEventListener('change', () => {
+        if (sel.value) loadSession(sel.value);
+      });
+      // Auto-select session from ?session= URL param
+      const params = new URLSearchParams(window.location.search);
+      const autoSession = params.get('session');
+      if (autoSession) {
+        sel.value = autoSession;
+        loadSession(autoSession);
+      }
+    }
+
+    async function loadSession(id) {
+      document.getElementById('status').textContent = 'Loading...';
+      try {
+        const [state, budget, cv, spikes, gating, tools, memory] = await Promise.all([
+          fetch(`${API}/api/session/${id}/state`).then(r => r.json()),
+          fetch(`${API}/api/session/${id}/budget`).then(r => r.json()),
+          fetch(`${API}/api/session/${id}/cv`).then(r => r.json()),
+          fetch(`${API}/api/session/${id}/spikes`).then(r => r.json()),
+          fetch(`${API}/api/session/${id}/gating`).then(r => r.json()),
+          fetch(`${API}/api/session/${id}/tools`).then(r => r.json()),
+          fetch(`${API}/api/session/${id}/memory`).then(r => r.json()),
+        ]);
+        renderState(state);
+        renderBudget(budget);
+        renderCV(cv);
+        renderSpikes(spikes);
+        renderGating(gating);
+        renderTools(tools);
+        renderMemory(memory);
+        document.getElementById('status').textContent = `Session: ${id}`;
+      } catch (e) {
+        document.getElementById('status').textContent = `Error: ${e.message}`;
+      }
+    }
+
+    // -- Renderers --
+    function renderState(s) {
+      const el = document.getElementById('stateContent');
+      if (!s || !s.drives) { el.innerHTML = '<span class="empty-state">No state data</span>'; return; }
+      let html = '<div class="metric-row">';
+      for (const [k, v] of Object.entries(s.drives || {})) {
+        html += `<div class="metric-item"><span class="metric-label">${k}</span><span class="metric-value">${typeof v === 'number' ? v.toFixed(2) : v}</span></div>`;
+      }
+      html += '</div>';
+      if (s.affect && Object.keys(s.affect).length) {
+        html += '<div class="metric-row" style="margin-top:12px">';
+        for (const [k, v] of Object.entries(s.affect)) {
+          html += `<div class="metric-item"><span class="metric-label">${k}</span><span class="metric-value">${typeof v === 'number' ? v.toFixed(2) : v}</span></div>`;
+        }
+        html += '</div>';
+      }
+      el.innerHTML = html;
+    }
+
+    function renderBudget(b) {
+      const el = document.getElementById('budgetMetrics');
+      const s = b.summary || {};
+      if (!s.initial_budget) { el.innerHTML = '<span class="empty-state">No budget data</span>'; return; }
+      const ratio = s.remaining_ratio || 0;
+      const color = ratio > 0.5 ? 'var(--green)' : ratio > 0.2 ? 'var(--yellow)' : 'var(--red)';
+      el.innerHTML = `
+        <div class="metric-item"><span class="metric-label">Remaining</span><span class="metric-value" style="color:${color}">${(ratio * 100).toFixed(0)}%</span></div>
+        <div class="metric-item"><span class="metric-label">Consumed</span><span class="metric-value">${s.consumed}</span></div>
+        <div class="metric-item"><span class="metric-label">Budget</span><span class="metric-value">${s.current_budget}/${s.initial_budget}</span></div>
+      `;
+      // Time series chart
+      const ts = b.timeseries || [];
+      if (ts.length === 0) return;
+      if (charts.budget) charts.budget.destroy();
+      charts.budget = new Chart(document.getElementById('budgetChart'), {
+        type: 'line',
+        data: {
+          labels: ts.map((_, i) => `T${i + 1}`),
+          datasets: [{
+            label: 'Remaining',
+            data: ts.map(t => t.remaining),
+            borderColor: '#6c8aff',
+            tension: 0.3,
+            fill: false,
+          }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, ticks: { color: '#8b8fa3' }, grid: { color: '#2a2d3a' } },
+                    x: { ticks: { color: '#8b8fa3' }, grid: { color: '#2a2d3a' } } } }
+      });
+    }
+
+    function renderCV(cv) {
+      const canvas = document.getElementById('cvChart');
+      if (!cv || !Object.keys(cv).length) return;
+      if (charts.cv) charts.cv.destroy();
+      const colors = ['#6c8aff', '#4ade80', '#f87171', '#fbbf24', '#a78bfa'];
+      const datasets = Object.entries(cv).map(([name, vals], i) => ({
+        label: name,
+        data: vals,
+        borderColor: colors[i % colors.length],
+        tension: 0.3,
+        fill: false,
+        pointRadius: 2,
+      }));
+      const maxLen = Math.max(...Object.values(cv).map(v => v.length));
+      charts.cv = new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels: Array.from({ length: maxLen }, (_, i) => `T${i + 1}`),
+          datasets,
+        },
+        options: { responsive: true,
+          plugins: { legend: { labels: { color: '#e1e4ed', font: { size: 11 } } } },
+          scales: { y: { min: 0, max: 1, ticks: { color: '#8b8fa3' }, grid: { color: '#2a2d3a' } },
+                    x: { ticks: { color: '#8b8fa3' }, grid: { color: '#2a2d3a' } } } }
+      });
+    }
+
+    function renderSpikes(spikes) {
+      const canvas = document.getElementById('spikeChart');
+      if (!spikes || !Object.keys(spikes).length) return;
+      if (charts.spikes) charts.spikes.destroy();
+      const colors = ['#6c8aff','#4ade80','#f87171','#fbbf24','#a78bfa','#f472b6','#22d3ee','#fb923c','#34d399','#818cf8'];
+      const datasets = Object.entries(spikes).map(([nid, counts], i) => ({
+        label: nid,
+        data: counts,
+        borderColor: colors[i % colors.length],
+        tension: 0.3,
+        fill: false,
+        pointRadius: 2,
+      }));
+      const maxLen = Math.max(...Object.values(spikes).map(v => v.length));
+      charts.spikes = new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels: Array.from({ length: maxLen }, (_, i) => `T${i + 1}`),
+          datasets,
+        },
+        options: { responsive: true,
+          plugins: { legend: { labels: { color: '#e1e4ed', font: { size: 11 } } } },
+          scales: { y: { beginAtZero: true, ticks: { color: '#8b8fa3', stepSize: 1 }, grid: { color: '#2a2d3a' } },
+                    x: { ticks: { color: '#8b8fa3' }, grid: { color: '#2a2d3a' } } } }
+      });
+    }
+
+    function renderGating(rows) {
+      const el = document.getElementById('gatingContent');
+      if (!rows || !rows.length) { el.innerHTML = '<span class="empty-state">No gating decisions</span>'; return; }
+      let html = '<div style="max-height:300px;overflow-y:auto"><table><thead><tr><th>ID</th><th>Canale</th><th>Valore</th><th>Decisione</th><th>Effetto</th><th>Reason</th></tr></thead><tbody>';
+      rows.forEach(r => {
+        const isBlock = r.decisione && r.decisione.includes('BLOCK');
+        const tagClass = isBlock ? 'tag-block' : 'tag-allow';
+        html += `<tr>
+          <td>${r.event_id || ''}</td>
+          <td>${r.canale}</td>
+          <td>${typeof r.valore === 'number' ? r.valore.toFixed(3) : r.valore}</td>
+          <td><span class="tag ${tagClass}">${r.decisione}</span></td>
+          <td>${r.effetto}</td>
+          <td style="color:var(--muted)">${r.reason}</td>
+        </tr>`;
+      });
+      html += '</tbody></table></div>';
+      el.innerHTML = html;
+    }
+
+    function renderTools(t) {
+      const el = document.getElementById('toolContent');
+      if (!t || t.total === 0) { el.innerHTML = '<span class="empty-state">No tool activity</span>'; return; }
+      const rateColor = t.deny_rate > 0.3 ? 'var(--red)' : t.deny_rate > 0.1 ? 'var(--yellow)' : 'var(--green)';
+      let html = `<div class="metric-row">
+        <div class="metric-item"><span class="metric-label">Calls</span><span class="metric-value">${t.tool_calls}</span></div>
+        <div class="metric-item"><span class="metric-label">Denied</span><span class="metric-value" style="color:var(--red)">${t.tool_denied}</span></div>
+        <div class="metric-item"><span class="metric-label">Deny Rate</span><span class="metric-value" style="color:${rateColor}">${(t.deny_rate * 100).toFixed(1)}%</span></div>
+      </div>`;
+      if (t.deny_reasons && Object.keys(t.deny_reasons).length) {
+        html += '<div style="margin-top:12px;font-size:13px;color:var(--muted)">';
+        for (const [reason, count] of Object.entries(t.deny_reasons)) {
+          html += `<div>${reason}: ${count}</div>`;
+        }
+        html += '</div>';
+      }
+      el.innerHTML = html;
+    }
+
+    function renderMemory(m) {
+      const el = document.getElementById('memoryContent');
+      if (!m || !Object.keys(m).length) { el.innerHTML = '<span class="empty-state">No memory records</span>'; return; }
+      let html = '<div class="metric-row">';
+      for (const [type, count] of Object.entries(m)) {
+        html += `<div class="metric-item"><span class="metric-label">${type}</span><span class="metric-value">${count}</span></div>`;
+      }
+      html += '</div>';
+      el.innerHTML = html;
+    }
+
+    init();
+  </script>
+</body>
+</html>
